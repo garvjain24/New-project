@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Self-Healing Agentic Data Pipeline</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Agentic Demo Control Room</p>
+          <h1>Self-Healing Data Pipeline Simulation</h1>
+          <p class="hero-text">
+            Clean records flow in from a standard database every 15 seconds. Random
+            pipeline failures are injected, detected, healed, or escalated in real time.
+          </p>
+        </div>
+        <div class="hero-status">
+          <div class="status-orb">
+            <span id="system-status-label">Booting</span>
+            <strong id="countdown">--s</strong>
+          </div>
+          <div class="hero-actions">
+            <button data-action="start">Start Loop</button>
+            <button data-action="run-now" class="secondary">Run Now</button>
+            <button data-action="stop" class="ghost">Pause</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span>Total Cycles</span>
+          <strong id="metric-cycles">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Detected Issues</span>
+          <strong id="metric-issues">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Auto Resolved</span>
+          <strong id="metric-resolved">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Human Escalations</span>
+          <strong id="metric-escalated">0</strong>
+        </article>
+      </section>
+
+      <section class="pipeline-panel">
+        <div class="pipeline-header">
+          <div>
+            <p class="eyebrow">Live Flow</p>
+            <h2>Streaming pipeline stages</h2>
+          </div>
+          <div class="pill" id="cycle-badge">Waiting for cycle</div>
+        </div>
+        <div class="pipeline-track">
+          <div class="node active">
+            <span>Source DB</span>
+            <strong>Orders / Payments / Delivery</strong>
+          </div>
+          <div class="beam"></div>
+          <div class="node warn">
+            <span>Validation</span>
+            <strong>Failure Detection</strong>
+          </div>
+          <div class="beam"></div>
+          <div class="node success">
+            <span>Agent Diagnosis</span>
+            <strong>Auto-Healing</strong>
+          </div>
+          <div class="beam"></div>
+          <div class="node danger">
+            <span>Escalation</span>
+            <strong>Human Review Queue</strong>
+          </div>
+        </div>
+      </section>
+
+      <main class="dashboard-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Cycle Summary</p>
+              <h2>Latest simulation batch</h2>
+            </div>
+          </div>
+          <div id="summary-grid" class="summary-grid"></div>
+          <div class="mini-columns">
+            <div>
+              <h3>Injected Failures</h3>
+              <ul id="injected-list" class="event-list compact"></ul>
+            </div>
+            <div>
+              <h3>Audit Decisions</h3>
+              <ul id="audit-list" class="event-list compact"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Event Feed</p>
+              <h2>What the pipeline is doing</h2>
+            </div>
+          </div>
+          <ul id="event-feed" class="event-list"></ul>
+        </section>
+
+        <section class="panel datasets-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Dataset Preview</p>
+              <h2>Dirty vs healed records</h2>
+            </div>
+          </div>
+          <div class="dataset-tabs">
+            <button class="tab active" data-tab="orders">Orders</button>
+            <button class="tab" data-tab="payments">Payments</button>
+            <button class="tab" data-tab="delivery">Delivery</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="table-head"></thead>
+              <tbody id="table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Escalation History</p>
+              <h2>Recent cycle outcomes</h2>
+            </div>
+          </div>
+          <div id="history-cards" class="history-cards"></div>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

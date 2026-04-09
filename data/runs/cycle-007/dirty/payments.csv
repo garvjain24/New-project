@@ -1,0 +1,20 @@
+order_id,payment_type,payment_value,payment_installments
+order_0020,pix,261.55,2
+order_0021,credit_card,269.00,3
+order_0044,boleto,440.35,2
+order_0054,boleto,forty two,6
+order_0059,boleto,552.10,5
+order_0068,voucher,619.15,2
+order_0069,boleto,626.60,3
+order_0071,credit_card,641.50,5
+order_0086,credit_card,753.25,2
+order_0089,boleto,775.60,5
+order_0098,voucher,842.65,2
+order_0101,credit_card,865.00,5
+order_0116,credit_card,976.75,2
+order_0129,telepathy,1073.60,3
+order_0139,boleto,1148.10,1
+order_0155,pix,1267.30,5
+order_0173,voucher,1401.40,5
+order_0183,voucher,1475.90,3
+order_0086,credit_card,753.25,2

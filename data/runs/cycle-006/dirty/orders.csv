@@ -1,0 +1,19 @@
+order_id,customer_id,order_purchase_timestamp,order_status
+order_0136,customer_0066,2018-01-31 13:30:00,invoiced
+order_0175,customer_0035,2018-02-08 16:30:00,processing
+order_0161,customer_0021,2018-02-05 18:30:00,delivered
+order_0139,customer_0069,2018-02-01 04:30:00,processing
+order_0178,customer_0038,2018-02-09 07:30:00,shipped
+order_0197,customer_0057,2018-02-13 06:30:00,delivered
+order_0115,customer_0045,2018-01-27 04:30:00,processing
+order_0034,customer_0034,2018-01-10 07:30:00,shipped
+order_0158,customer_0018,2026/99/99 88:61:00,shipped
+order_0107,customer_0037,2018-01-25 12:30:00,processing
+order_0130,customer_0060,2018-01-30 07:30:00,shipped
+order_0146,customer_0006,2018-02-02 15:30:00,shipped
+order_0154,customer_0014,2018-02-04 07:30:00,shipped
+order_0026,customer_0026,2018-01-08 15:30:00,shipped
+order_0030,customer_0030,2018-01-09 11:30:00,shipped
+order_0089,customer_0019,2018-01-21 18:30:00,delivered
+order_0004,customer_0004,2018-01-04 01:30:00,invoiced
+order_0065,customer_0065,2018-01-16 18:30:00,delivered
