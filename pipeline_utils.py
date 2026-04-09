@@ -48,7 +48,8 @@ def write_dataset(directory, dataset, dirty=False):
     directory = Path(directory)
     suffix = "_dirty" if dirty else ""
     for name, rows in dataset.items():
-        write_csv_rows(directory / f"{name}{suffix}.csv", rows, REQUIRED_COLUMNS[name])
+        fieldnames = None if dirty else REQUIRED_COLUMNS[name]
+        write_csv_rows(directory / f"{name}{suffix}.csv", rows, fieldnames)
 
 
 def build_clean_dataset(rows, source_dir):

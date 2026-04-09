@@ -1,5 +1,10 @@
 import argparse
+import sys
 from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 from pipeline_utils import (
     DEFAULT_SOURCE_DIR,
@@ -8,7 +13,6 @@ from pipeline_utils import (
     write_dataset,
 )
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 CLEAN_DIR = DATA_DIR / "clean"
 SOURCE_DIR = DATA_DIR / "source"

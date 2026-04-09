@@ -137,16 +137,26 @@ function render() {
 
   renderSummary(cycle);
   renderList("injected-list", cycle?.injected_errors, (item) => `
-    <div class="event-meta"><span>${item.dataset}</span><span>${item.severity}</span></div>
-    <div>${item.message}</div>
+    <div class="event-meta"><span>${item.error_id}</span><span>${item.severity}</span></div>
+    <div>${item.dataset}: ${item.message}</div>
   `);
-  renderList("audit-list", cycle?.audit, (item) => `
-    <div class="event-meta"><span>${item.owner}</span><span>${item.status}</span></div>
-    <div>${item.resolution}</div>
+  renderList("audit-list", cycle?.detailed_logs, (item) => `
+    <div class="event-meta"><span>${item.error_id}</span><span>${item.status}</span></div>
+    <div>${item.resolution_action}</div>
   `);
   renderList("event-feed", payload.event_feed, (item) => `
     <div class="event-meta"><span>${item.stage}</span><span>${item.time}</span></div>
     <div>${item.message}</div>
+  `);
+  renderList("detailed-log-list", cycle?.detailed_logs, (item) => `
+    <div class="event-meta"><span>${item.error_id}</span><span>${item.resolver}</span></div>
+    <div><strong>${item.dataset}</strong> / ${item.error_type}</div>
+    <div>${item.finding}</div>
+    <div>Dirty: ${item.dirty_value ?? "-"}</div>
+    <div>Original: ${item.original_value ?? "-"}</div>
+    <div>Action: ${item.resolution_action}</div>
+    <div>Resolved: ${item.resolved_value ?? "-"}</div>
+    <div>Status: ${item.status}</div>
   `);
   renderTable(cycle);
   renderHistory(payload.history);

@@ -1,11 +1,15 @@
 import argparse
 import json
 import random
+import sys
 from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 from pipeline_utils import generate_dirty_dataset, load_dataset, write_dataset
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 CLEAN_DIR = DATA_DIR / "clean"
 DIRTY_DIR = DATA_DIR / "dirty"

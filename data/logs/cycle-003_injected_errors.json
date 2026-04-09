@@ -1,0 +1,65 @@
+{
+  "cycle_id": "cycle-003",
+  "injected_errors": [
+    {
+      "error_id": "cycle-003-001",
+      "cycle_id": "cycle-003",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 7,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "15.17",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "cycle-003-002",
+      "cycle_id": "cycle-003",
+      "type": "null_key",
+      "dataset": "delivery",
+      "severity": "critical",
+      "row_index": 9,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "e69bfb5eb88e0ed6a785585b27e16dbf",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "cycle-003-003",
+      "cycle_id": "cycle-003",
+      "type": "invalid_payment_value",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 66,
+      "column": "payment_value",
+      "message": "Payment value was converted from numeric to text.",
+      "original_value": "39.99",
+      "dirty_value": "ten thousand"
+    },
+    {
+      "error_id": "cycle-003-004",
+      "cycle_id": "cycle-003",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 167,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "cycle-003-005",
+      "cycle_id": "cycle-003",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 149,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2017-11-26 09:32:06",
+      "dirty_value": "2026/99/99 88:61:00"
+    }
+  ]
+}

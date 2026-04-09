@@ -1,0 +1,53 @@
+{
+  "cycle_id": "cycle-001",
+  "injected_errors": [
+    {
+      "error_id": "cycle-001-001",
+      "cycle_id": "cycle-001",
+      "type": "invalid_payment_value",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 82,
+      "column": "payment_value",
+      "message": "Payment value was converted from numeric to text.",
+      "original_value": "132.26",
+      "dirty_value": "ten thousand"
+    },
+    {
+      "error_id": "cycle-001-002",
+      "cycle_id": "cycle-001",
+      "type": "null_key",
+      "dataset": "delivery",
+      "severity": "critical",
+      "row_index": 75,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "a910f58086d58b3ae6f37aa712d377b9",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "cycle-001-003",
+      "cycle_id": "cycle-001",
+      "type": "duplicate_record",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 199,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "cycle-001-004",
+      "cycle_id": "cycle-001",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 61,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "13.76",
+      "dirty_value": "99999.99"
+    }
+  ]
+}
