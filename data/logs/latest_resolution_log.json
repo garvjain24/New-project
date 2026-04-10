@@ -382,7 +382,7 @@
     {
       "error_id": "batch-006-008",
       "detected_at": "2026-04-11 02:01:15",
-      "resolved_at": "2026-04-11 02:01:25",
+      "resolved_at": "2026-04-11 02:32:34",
       "detection_latency_sec": 2,
       "dataset": "delivery",
       "error_type": "null_key",
@@ -393,12 +393,12 @@
       "dirty_value": "",
       "original_value": "2711a938db643b3f0b62ee2c8a2784aa",
       "order_id": "2711a938db643b3f0b62ee2c8a2784aa",
-      "resolver": "Human Ops",
-      "status": "escalated",
-      "resolution_action": "Waiting for human approval to restore the primary key.",
+      "resolver": "Human Approved",
+      "status": "approved",
+      "resolution_action": "Approved by human reviewer. Restore blank primary key from clean source trace.",
       "resolved_value": "2711a938db643b3f0b62ee2c8a2784aa",
-      "approval_required": true,
-      "resolution_latency_sec": 180,
+      "approval_required": false,
+      "resolution_latency_sec": 240,
       "agent_route": "local_fallback",
       "agent_reason": "No LLM available or no strong local match; using conservative local rules.",
       "retrieved_context": [
@@ -445,12 +445,18 @@
       "current_value": "",
       "proposed_value": "6fa204b6cf6dcfe6c9adca7dc53aa32a",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-001",
       "created_at": "2026-04-11 01:59:18",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:29"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:29"
     },
     {
       "error_id": "batch-002-006",
@@ -462,12 +468,18 @@
       "current_value": "",
       "proposed_value": "948097deef559c742e7ce321e5e58919",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-002",
       "created_at": "2026-04-11 01:59:44",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:30"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:30"
     },
     {
       "error_id": "batch-003-002",
@@ -479,12 +491,18 @@
       "current_value": "",
       "proposed_value": "a7cd6af6e0519313887b3c3a120f20ca",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-003",
       "created_at": "2026-04-11 02:00:07",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:32"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:32"
     },
     {
       "error_id": "batch-005-004",
@@ -496,12 +514,18 @@
       "current_value": "",
       "proposed_value": "f2fa3795760c35b8c05fa8e2f09d5143",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-005",
       "created_at": "2026-04-11 02:00:53",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:33"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:33"
     },
     {
       "error_id": "batch-006-008",
@@ -513,12 +537,18 @@
       "current_value": "",
       "proposed_value": "2711a938db643b3f0b62ee2c8a2784aa",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-006",
       "created_at": "2026-04-11 02:01:15",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:34"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:34"
     }
   ],
   "all_escalations": [
@@ -532,12 +562,18 @@
       "current_value": "",
       "proposed_value": "6fa204b6cf6dcfe6c9adca7dc53aa32a",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-001",
       "created_at": "2026-04-11 01:59:18",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:29"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:29"
     },
     {
       "error_id": "batch-002-006",
@@ -549,12 +585,18 @@
       "current_value": "",
       "proposed_value": "948097deef559c742e7ce321e5e58919",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-002",
       "created_at": "2026-04-11 01:59:44",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:30"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:30"
     },
     {
       "error_id": "batch-003-002",
@@ -566,12 +608,18 @@
       "current_value": "",
       "proposed_value": "a7cd6af6e0519313887b3c3a120f20ca",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-003",
       "created_at": "2026-04-11 02:00:07",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:32"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:32"
     },
     {
       "error_id": "batch-005-004",
@@ -583,12 +631,18 @@
       "current_value": "",
       "proposed_value": "f2fa3795760c35b8c05fa8e2f09d5143",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-005",
       "created_at": "2026-04-11 02:00:53",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:33"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:33"
     },
     {
       "error_id": "batch-006-008",
@@ -600,12 +654,18 @@
       "current_value": "",
       "proposed_value": "2711a938db643b3f0b62ee2c8a2784aa",
       "reason": "Restore blank primary key from clean source trace.",
-      "status": "pending",
+      "status": "approved",
       "proposed_field": "order_id",
       "request_kind": "human_approval",
       "batch_id": "batch-006",
       "created_at": "2026-04-11 02:01:15",
-      "history": []
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-11 02:32:34"
+        }
+      ],
+      "approved_at": "2026-04-11 02:32:34"
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-04-11 02:01:27",
+  "generated_at": "2026-04-11 02:32:34",
   "system": {
     "server_started_at": "2026-04-11 01:59:16",
-    "uptime_seconds": 131.4,
-    "crash_free_uptime_seconds": 131.4,
+    "uptime_seconds": 1998.06,
+    "crash_free_uptime_seconds": 1998.06,
     "crash_count": 0,
     "successful_batches_total": 6,
     "failed_batches_total": 0,
@@ -23,17 +23,17 @@
   "human_metrics": {
     "human_approval_requests_total": 5,
     "human_resolution_requests_total": 2,
-    "human_approved_total": 0,
+    "human_approved_total": 5,
     "human_rejected_total": 0,
     "manual_fix_total": 0,
-    "open_human_queue_total": 5
+    "open_human_queue_total": 0
   },
   "performance_metrics": {
     "mttd_seconds": 5.24,
-    "mttr_seconds": 40.62,
+    "mttr_seconds": 49.44,
     "issues_detected_total": 34,
-    "issues_resolved_total": 27,
-    "issues_escalated_total": 7
+    "issues_resolved_total": 32,
+    "issues_escalated_total": 2
   },
   "recent_breakdowns": {
     "routes": {
@@ -52,7 +52,8 @@
     },
     "statuses": {
       "resolved": 27,
-      "escalated": 7
+      "approved": 5,
+      "escalated": 2
     },
     "datasets": {
       "delivery": 13,
@@ -65,10 +66,10 @@
       "batch_id": "batch-006",
       "started_at": "2026-04-11 02:01:15",
       "batch_size": 14,
-      "status": "attention",
+      "status": "healthy",
       "detected": 8,
-      "resolved": 7,
-      "escalated": 1
+      "resolved": 8,
+      "escalated": 0
     },
     {
       "batch_id": "batch-005",
@@ -76,8 +77,8 @@
       "batch_size": 15,
       "status": "attention",
       "detected": 6,
-      "resolved": 4,
-      "escalated": 2
+      "resolved": 5,
+      "escalated": 1
     },
     {
       "batch_id": "batch-004",
@@ -92,19 +93,19 @@
       "batch_id": "batch-003",
       "started_at": "2026-04-11 02:00:07",
       "batch_size": 13,
-      "status": "attention",
+      "status": "healthy",
       "detected": 4,
-      "resolved": 3,
-      "escalated": 1
+      "resolved": 4,
+      "escalated": 0
     },
     {
       "batch_id": "batch-002",
       "started_at": "2026-04-11 01:59:44",
       "batch_size": 13,
-      "status": "attention",
+      "status": "healthy",
       "detected": 6,
-      "resolved": 5,
-      "escalated": 1
+      "resolved": 6,
+      "escalated": 0
     },
     {
       "batch_id": "batch-001",
@@ -112,52 +113,11 @@
       "batch_size": 14,
       "status": "attention",
       "detected": 6,
-      "resolved": 4,
-      "escalated": 2
+      "resolved": 5,
+      "escalated": 1
     }
   ],
-  "open_escalations": [
-    {
-      "error_id": "batch-001-004",
-      "batch_id": "batch-001",
-      "dataset": "delivery",
-      "status": "pending",
-      "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "6fa204b6cf6dcfe6c9adca7dc53aa32a"
-    },
-    {
-      "error_id": "batch-002-006",
-      "batch_id": "batch-002",
-      "dataset": "orders",
-      "status": "pending",
-      "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "948097deef559c742e7ce321e5e58919"
-    },
-    {
-      "error_id": "batch-003-002",
-      "batch_id": "batch-003",
-      "dataset": "orders",
-      "status": "pending",
-      "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "a7cd6af6e0519313887b3c3a120f20ca"
-    },
-    {
-      "error_id": "batch-005-004",
-      "batch_id": "batch-005",
-      "dataset": "orders",
-      "status": "pending",
-      "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "f2fa3795760c35b8c05fa8e2f09d5143"
-    },
-    {
-      "error_id": "batch-006-008",
-      "batch_id": "batch-006",
-      "dataset": "delivery",
-      "status": "pending",
-      "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "2711a938db643b3f0b62ee2c8a2784aa"
-    }
-  ],
+  "open_escalations": [],
   "downloads": {
     "report_download_total": 0,
     "json_path": "/Users/garv/Documents/New project/data/logs/latest_analysis_report.json",
