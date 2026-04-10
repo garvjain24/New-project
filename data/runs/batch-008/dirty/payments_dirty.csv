@@ -1,12 +1,14 @@
-order_id,payment_type,payment_value,payment_installments
-a4591c265e18cb1dcee52889e2d8acc3,credit_card,175.26,6
-5acce57f8d9dfd55fa48e212a641a69d,telepathy,43.00,1
-68873cf91053cd11e6b49a766db5af1a,boleto,ten thousand,1
-bd4bd0194d6d29f83b8557d4b89b572a,boleto,37.83,1
-e3447938231fb6ba2fee0231b51eca59,credit_card,172.14,2
-orphan-5975,credit_card,38.47,3
-265f4e28ef8cf69f8445e2951bbe7343,credit_card,64.74,1
-36530871a5e80138db53bcfd8a104d90,credit_card,63.79,6
-36ebb4199031e72a1fa964549b88c377,voucher,133.25,1
-ee990334acb0ff9333b01afa465f3006,boleto,445.32,1
-ba4ddff2b9082f079de9a84d7a5605fd,credit_card,65.47,1
+order_id,payment_type,payment_installments
+76c6e866289321a7c93b82b54852dc33,boleto,1
+f848643eec1d69395095eb3840d2051e,credit_card,4
+8563039e855156e48fccee4d611a3196,credit_card,4
+434d158e96bdd6972ad6e6d73ddcfd22,boleto,1
+40c5e18f7d112b59b3e5113a59a905b3,credit_card,3
+f346ad4ee8f630e5e4ddaf862a34e6dd,credit_card,1
+f271576bed568e896f99eb710cd3a6f8,credit_card,4
+6a0a8bfbbe700284feb0845d95e0867f,credit_card,5
+,telepathy,1
+210e60465099814a1d2c7635e4065153,credit_card,8
+5164933efe0cd14f31424b9badf81f19,credit_card,1
+5487a8ac1699754d975f853ce8bb9321,boleto,1
+5e99f3c445038a0709b2aea8e34ed593,credit_card,1

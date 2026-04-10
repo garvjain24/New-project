@@ -368,6 +368,29 @@ def generate_dirty_dataset(clean_dataset, cycle_id, error_count=None, rng=None):
             column=column,
         )
 
+    def invalid_order_status():
+        rows, idx = pick_row("orders")
+        if idx is None:
+            return
+        if "order_status" not in rows[idx]:
+            return
+        original = rows[idx]["order_status"]
+        dirty_value = rng.choice(["delivered_to_mars", "quantum_entangled", "schrodingers_box"])
+        rows[idx]["order_status"] = dirty_value
+        _append_error(
+            errors,
+            cycle_id,
+            "invalid_order_status",
+            "orders",
+            "low",
+            "Order status was changed to a nonsensical anomaly.",
+            row_index=idx,
+            column="order_status",
+            original_value=original,
+            dirty_value=dirty_value,
+        )
+
+
     operations.extend(
         [
             null_key,

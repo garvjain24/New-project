@@ -12,6 +12,7 @@ import urllib.request
 from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timezone
+import types
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -173,8 +174,16 @@ class LocalSimilarityResolver:
 
 class OpenRouterClient:
     def __init__(self):
+        env_file = BASE_DIR / ".env"
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+
         self.api_key = os.environ.get("OPENROUTER_API_KEY", "")
-        self.model = os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+        self.model = os.environ.get("OPENROUTER_MODEL", "google/gemma-4-26b-a4b-it:free")
         self.site_url = os.environ.get("OPENROUTER_SITE_URL", "http://localhost")
         self.site_name = os.environ.get("OPENROUTER_APP_NAME", "Self-Healing Agentic Data Pipeline")
 
@@ -182,46 +191,23 @@ class OpenRouterClient:
     def enabled(self):
         return bool(self.api_key)
 
-    def suggest(self, issue, retrieved_context):
-        if not self.enabled:
-            return None
-        prompt = {
-            "task": "Suggest a safe data-healing action for this pipeline issue.",
-            "rules": [
-                "Prefer local trusted data over invention.",
-                "If the issue can be fixed deterministically from local trusted data, say local_only.",
-                "If confidence is low or primary key is ambiguous, say escalate.",
-                "Return compact JSON only.",
+    def _call_openrouter(self, model, prompt, include_reasoning=True, response_format=None):
+        payload = {
+            "model": model,
+            "temperature": 0,
+            "messages": [
+                {"role": "system", "content": "You are a careful data reliability agent."},
+                {"role": "user", "content": json.dumps(prompt)},
             ],
-            "issue": {
-                "error_type": issue.get("error_type"),
-                "dataset": issue.get("dataset"),
-                "finding": issue.get("finding"),
-                "dirty_value": issue.get("dirty_value"),
-                "original_value": issue.get("original_value"),
-                "order_id": issue.get("order_id"),
-            },
-            "retrieved_context": retrieved_context,
-            "output_schema": {
-                "route": "local_only | llm_guided_local | escalate",
-                "reason": "short string",
-                "recommended_action": "short string",
-                "confidence": "0-1 float",
-            },
         }
+        if response_format:
+            payload["response_format"] = response_format
+        if include_reasoning:
+            payload["reasoning"] = {"enabled": True}
+            
         request = urllib.request.Request(
             "https://openrouter.ai/api/v1/chat/completions",
-            data=json.dumps(
-                {
-                    "model": self.model,
-                    "temperature": 0,
-                    "response_format": {"type": "json_object"},
-                    "messages": [
-                        {"role": "system", "content": "You are a careful data reliability agent."},
-                        {"role": "user", "content": json.dumps(prompt)},
-                    ],
-                }
-            ).encode("utf-8"),
+            data=json.dumps(payload).encode("utf-8"),
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
@@ -232,14 +218,92 @@ class OpenRouterClient:
         )
         try:
             with urllib.request.urlopen(request, timeout=20) as response:
-                payload = json.loads(response.read().decode("utf-8"))
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+                resp_payload = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode("utf-8")
+            error_msg = f"[{datetime.now().isoformat()}] [{model}] HTTPError {e.code}: {error_body}\n"
+            (LOGS_DIR / "openrouter_errors.log").open("a", encoding="utf-8").write(error_msg)
+            print(error_msg)
             return None
+        except Exception as e:
+            error_msg = f"[{datetime.now().isoformat()}] [{model}] Exception: {str(e)}\n"
+            (LOGS_DIR / "openrouter_errors.log").open("a", encoding="utf-8").write(error_msg)
+            print(error_msg)
+            return None
+            
         try:
-            content = payload["choices"][0]["message"]["content"]
+            content = resp_payload["choices"][0]["message"]["content"]
+            # some reasoning models return reasoning wrapper or markdown json blocks
+            # clean markdown json blocks just in case
+            if content.startswith("```json"):
+                content = content[7:-3].strip()
+            elif content.startswith("```"):
+                content = content[3:-3].strip()
             return json.loads(content)
-        except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+        except Exception as e:
+            error_msg = f"[{datetime.now().isoformat()}] [{model}] Parse Error: {str(e)} | Payload: {json.dumps(resp_payload)}\n"
+            (LOGS_DIR / "openrouter_errors.log").open("a", encoding="utf-8").write(error_msg)
+            print(error_msg)
             return None
+
+    def suggest(self, issue, retrieved_context):
+        if not self.enabled:
+            return None
+        prompt = {
+            "task": "Suggest a safe data-healing action for this pipeline issue and provide Python code to execute the fix.",
+            "rules": [
+                "Prefer local trusted data over invention.",
+                "If the issue can be fixed deterministically from local trusted data, provide Python code.",
+                f"The python code must be a complete function named `heal_{issue.get('error_type')}`.",
+                f"Signature MUST be exactly: `def heal_{issue.get('error_type')}(issue, healed, clean_lookup):`",
+                "The `healed` argument is a dictionary: {'orders': [...], 'payments': [...], 'delivery': [...]}. Modify it in place using row_index.",
+                "The `clean_lookup` argument is a dict mapping dataset names to a dict mapping order_id to row dicts.",
+                "If you cannot solve it or confidence is low, say escalate and leave python_code empty.",
+                "Return compact JSON only.",
+            ],
+            "issue": {
+                "error_type": issue.get("error_type"),
+                "dataset": issue.get("dataset"),
+                "finding": issue.get("finding"),
+                "dirty_value": issue.get("dirty_value"),
+                "original_value": issue.get("original_value"),
+                "order_id": issue.get("order_id"),
+                "row_index": issue.get("row_index"),
+                "column": issue.get("column"),
+            },
+            "retrieved_context": retrieved_context,
+            "output_schema": {
+                "route": "generate_local | escalate",
+                "reason": "Explain your reasoning",
+                "recommended_action": "short string",
+                "confidence": "0-1 float",
+                "python_code": "String containing the exact Python function definition. Empty if escalating. Do not wrap in markdown tags like ```python inside this JSON field.",
+            },
+        }
+
+        # primary model attempt
+        result = self._call_openrouter(self.model, prompt, include_reasoning=True, response_format={"type": "json_object"})
+        if result:
+            return result
+            
+        # fallback model attempt 1
+        fallback_model_1 = "qwen/qwen3-coder:free"
+        print(f"[{datetime.now().isoformat()}] Primary model {self.model} failed, falling back to {fallback_model_1}")
+        result = self._call_openrouter(fallback_model_1, prompt, include_reasoning=False, response_format=None)
+        if result:
+            return result
+            
+        # fallback model attempt 2
+        fallback_model_2 = "meta-llama/llama-3.3-70b-instruct:free"
+        print(f"[{datetime.now().isoformat()}] Fallback model {fallback_model_1} failed, falling back to {fallback_model_2}")
+        result = self._call_openrouter(fallback_model_2, prompt, include_reasoning=False, response_format=None)
+        if result:
+            return result
+            
+        # fallback model attempt 3
+        fallback_model_3 = "liquid/lfm-2.5-1.2b-instruct:free"
+        print(f"[{datetime.now().isoformat()}] Fallback model {fallback_model_2} failed, falling back to {fallback_model_3}")
+        return self._call_openrouter(fallback_model_3, prompt, include_reasoning=False, response_format=None)
 
 
 class SimulationEngine:
@@ -268,6 +332,20 @@ class SimulationEngine:
             "failed_batches_total": 0,
             "report_download_total": 0,
         }
+        
+        self.healers_path = BASE_DIR / "generated_healers.py"
+        if not self.healers_path.exists():
+            self.healers_path.write_text("import json\nfrom copy import deepcopy\n\n", encoding="utf-8")
+        self.healers_module = types.ModuleType("generated_healers")
+        self._load_healers()
+
+    def _load_healers(self):
+        try:
+            code = self.healers_path.read_text(encoding="utf-8")
+            exec(code, self.healers_module.__dict__)
+        except Exception as e:
+            print(f"Error loading generated healers: {e}")
+
         self.state = {
             "running": True,
             "cycle_seconds": CYCLE_SECONDS,
@@ -460,38 +538,33 @@ Generated at: {report['generated_at']}
         paths["md"].write_text(self._analysis_markdown(report), encoding="utf-8")
 
     def _agent_route(self, issue):
+        error_type = issue.get("error_type")
         retrieved = self.local_resolver.retrieve(issue, self._historical_logs())
-        top_score = retrieved[0]["score"] if retrieved else 0.0
-        local_safe_types = {
-            "duplicate_record",
-            "invalid_payment_value",
-            "invalid_timestamp",
-            "freight_outlier",
-            "unknown_payment_type",
-            "missing_column",
-        }
-        if issue.get("error_type") in local_safe_types and top_score >= 0.1:
-            self.telemetry["local_similarity_route_total"] += 1
+
+        func_name = f"heal_{error_type}"
+        if hasattr(self.healers_module, func_name):
             return {
-                "route": "local_similarity",
-                "reason": "Matched local playbook/history with enough confidence.",
+                "route": "generated_local",
+                "reason": f"Using previously generated healer function {func_name} to save LLM cost.",
                 "retrieved_context": retrieved,
                 "llm_suggestion": None,
+                "healer_func": getattr(self.healers_module, func_name)
             }
+
         if self.openrouter.enabled:
             self.telemetry["llm_calls_total"] += 1
-        suggestion = self.openrouter.suggest(issue, retrieved)
-        if suggestion:
-            route = suggestion.get("route", "llm_guided_local")
-            if route == "llm_guided_local":
-                self.telemetry["llm_guided_route_total"] += 1
-            self.telemetry["llm_success_total"] += 1
-            return {
-                "route": route,
-                "reason": suggestion.get("reason", "LLM-guided decision."),
-                "retrieved_context": retrieved,
-                "llm_suggestion": suggestion,
-            }
+            suggestion = self.openrouter.suggest(issue, retrieved)
+            if suggestion:
+                route = suggestion.get("route", "llm_guided_local")
+                if route in ["llm_guided_local", "generate_local"]:
+                    self.telemetry["llm_guided_route_total"] += 1
+                self.telemetry["llm_success_total"] += 1
+                return {
+                    "route": route,
+                    "reason": suggestion.get("reason", "LLM-guided decision."),
+                    "retrieved_context": retrieved,
+                    "llm_suggestion": suggestion,
+                }
         self.telemetry["local_fallback_route_total"] += 1
         return {
             "route": "local_fallback",
@@ -663,6 +736,44 @@ Generated at: {report['generated_at']}
             log["agent_reason"] = agent_plan["reason"]
             log["retrieved_context"] = agent_plan["retrieved_context"]
             log["llm_suggestion"] = agent_plan["llm_suggestion"]
+
+            healer_func = agent_plan.get("healer_func")
+
+            if not healer_func and agent_plan["llm_suggestion"]:
+                python_code = agent_plan["llm_suggestion"].get("python_code", "")
+                if python_code:
+                    try:
+                        # Compile to verify valid Python syntax before appending
+                        compile(python_code, "<string>", "exec")
+                        self.healers_path.open("a", encoding="utf-8").write("\n\n" + python_code + "\n")
+                        self._load_healers()
+                        func_name = f"heal_{error_type}"
+                        if hasattr(self.healers_module, func_name):
+                            healer_func = getattr(self.healers_module, func_name)
+                            log["agent_reason"] += f" (Generated and saved new local function {func_name})"
+                    except SyntaxError as e:
+                        print(f"LLM generated invalid syntax: {e}")
+                    except Exception as e:
+                        print(f"Failed to save/load new python code from LLM: {e}")
+
+            if healer_func:
+                try:
+                    healer_func(issue, healed, clean_lookup)
+                    log["resolution_action"] = f"Executed local function heal_{error_type}"
+                    log["resolved_value"] = "fixed via generated function"
+                    log["resolution_latency_sec"] = self._simulated_resolution_latency(error_type)
+                    
+                    log["resolver"] = "Local Agent (Generated Healer)"
+                    if agent_plan["llm_suggestion"] and agent_plan["route"] in ["llm_guided_local", "generate_local"]:
+                        log["resolver"] = "OpenRouter LLM + Local Context"
+                        self.telemetry["llm_assisted_resolved_total"] += 1
+                    else:
+                        self.telemetry["local_rule_resolved_total"] += 1
+
+                    logs.append(log)
+                    continue
+                except Exception as e:
+                    print(f"Execution of healer_func failed: {e}")
 
             if error_type == "missing_column":
                 restored = 0

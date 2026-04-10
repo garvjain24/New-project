@@ -4,54 +4,6 @@
     {
       "error_id": "batch-002-001",
       "cycle_id": "batch-002",
-      "type": "duplicate_record",
-      "dataset": "payments",
-      "severity": "medium",
-      "row_index": 2,
-      "column": null,
-      "message": "A duplicate record was appended.",
-      "original_value": null,
-      "dirty_value": null
-    },
-    {
-      "error_id": "batch-002-002",
-      "cycle_id": "batch-002",
-      "type": "freight_outlier",
-      "dataset": "delivery",
-      "severity": "low",
-      "row_index": 12,
-      "column": "freight_value",
-      "message": "Freight value was changed to an unrealistic outlier.",
-      "original_value": "16.46",
-      "dirty_value": "99999.99"
-    },
-    {
-      "error_id": "batch-002-003",
-      "cycle_id": "batch-002",
-      "type": "orphan_record",
-      "dataset": "delivery",
-      "severity": "high",
-      "row_index": 2,
-      "column": "order_id",
-      "message": "Foreign key no longer matches a clean order.",
-      "original_value": "6514b8ad8028c9f2cc2374ded245783f",
-      "dirty_value": "orphan-3683"
-    },
-    {
-      "error_id": "batch-002-004",
-      "cycle_id": "batch-002",
-      "type": "null_key",
-      "dataset": "payments",
-      "severity": "critical",
-      "row_index": 1,
-      "column": "order_id",
-      "message": "Primary key order_id was blanked out.",
-      "original_value": "a4591c265e18cb1dcee52889e2d8acc3",
-      "dirty_value": ""
-    },
-    {
-      "error_id": "batch-002-005",
-      "cycle_id": "batch-002",
       "type": "missing_column",
       "dataset": "payments",
       "severity": "high",
@@ -60,6 +12,66 @@
       "message": "A required column was removed from the dataset.",
       "original_value": null,
       "dirty_value": null
+    },
+    {
+      "error_id": "batch-002-002",
+      "cycle_id": "batch-002",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 4,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2018-06-07 10:06:19",
+      "dirty_value": "2026/99/99 88:61:00"
+    },
+    {
+      "error_id": "batch-002-003",
+      "cycle_id": "batch-002",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 2,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "boleto",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-002-004",
+      "cycle_id": "batch-002",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 6,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "14.10",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-002-005",
+      "cycle_id": "batch-002",
+      "type": "duplicate_record",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 5,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-002-006",
+      "cycle_id": "batch-002",
+      "type": "null_key",
+      "dataset": "orders",
+      "severity": "critical",
+      "row_index": 12,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "948097deef559c742e7ce321e5e58919",
+      "dirty_value": ""
     }
   ]
 }

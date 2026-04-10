@@ -4,17 +4,77 @@
     {
       "error_id": "batch-006-001",
       "cycle_id": "batch-006",
+      "type": "duplicate_record",
+      "dataset": "delivery",
+      "severity": "medium",
+      "row_index": 4,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-006-002",
+      "cycle_id": "batch-006",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 0,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-006-003",
+      "cycle_id": "batch-006",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 6,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2018-02-06 21:09:10",
+      "dirty_value": "2026/99/99 88:61:00"
+    },
+    {
+      "error_id": "batch-006-004",
+      "cycle_id": "batch-006",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 12,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "9.45",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-006-005",
+      "cycle_id": "batch-006",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 1,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "5ff96c15d0b717ac6ad1f3d77225a350",
+      "dirty_value": "orphan-5482"
+    },
+    {
+      "error_id": "batch-006-006",
+      "cycle_id": "batch-006",
       "type": "invalid_payment_value",
       "dataset": "payments",
       "severity": "medium",
-      "row_index": 9,
+      "row_index": 7,
       "column": "payment_value",
       "message": "Payment value was converted from numeric to text.",
       "original_value": "78.15",
       "dirty_value": "forty two"
     },
     {
-      "error_id": "batch-006-002",
+      "error_id": "batch-006-007",
       "cycle_id": "batch-006",
       "type": "missing_column",
       "dataset": "delivery",
@@ -26,40 +86,16 @@
       "dirty_value": null
     },
     {
-      "error_id": "batch-006-003",
+      "error_id": "batch-006-008",
       "cycle_id": "batch-006",
-      "type": "unknown_payment_type",
-      "dataset": "payments",
-      "severity": "low",
-      "row_index": 11,
-      "column": "payment_type",
-      "message": "Payment type was changed to an unsupported value.",
-      "original_value": "credit_card",
-      "dirty_value": "telepathy"
-    },
-    {
-      "error_id": "batch-006-004",
-      "cycle_id": "batch-006",
-      "type": "invalid_timestamp",
-      "dataset": "orders",
-      "severity": "medium",
-      "row_index": 14,
-      "column": "order_purchase_timestamp",
-      "message": "Order purchase timestamp was malformed.",
-      "original_value": "2018-02-28 17:00:28",
-      "dirty_value": "2026/99/99 88:61:00"
-    },
-    {
-      "error_id": "batch-006-005",
-      "cycle_id": "batch-006",
-      "type": "duplicate_record",
+      "type": "null_key",
       "dataset": "delivery",
-      "severity": "medium",
-      "row_index": 6,
-      "column": null,
-      "message": "A duplicate record was appended.",
-      "original_value": null,
-      "dirty_value": null
+      "severity": "critical",
+      "row_index": 4,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "2711a938db643b3f0b62ee2c8a2784aa",
+      "dirty_value": ""
     }
   ]
 }

@@ -1,143 +1,166 @@
 {
-  "generated_at": "2026-04-10 21:34:04",
+  "generated_at": "2026-04-11 02:01:27",
   "system": {
-    "server_started_at": "2026-04-10 21:29:20",
-    "uptime_seconds": 283.88,
-    "crash_free_uptime_seconds": 283.88,
+    "server_started_at": "2026-04-11 01:59:16",
+    "uptime_seconds": 131.4,
+    "crash_free_uptime_seconds": 131.4,
     "crash_count": 0,
     "successful_batches_total": 6,
     "failed_batches_total": 0,
     "batch_success_rate_pct": 100.0
   },
   "agent_metrics": {
-    "openrouter_enabled": false,
-    "openrouter_model": "openai/gpt-4o-mini",
-    "llm_calls_total": 0,
+    "openrouter_enabled": true,
+    "openrouter_model": "google/gemma-4-26b-a4b-it:free",
+    "llm_calls_total": 31,
     "llm_success_total": 0,
-    "local_similarity_route_total": 28,
-    "local_fallback_route_total": 9,
+    "local_similarity_route_total": 0,
+    "local_fallback_route_total": 31,
     "llm_guided_route_total": 0,
-    "local_rule_resolved_total": 29,
+    "local_rule_resolved_total": 27,
     "llm_assisted_resolved_total": 0
   },
   "human_metrics": {
     "human_approval_requests_total": 5,
-    "human_resolution_requests_total": 3,
-    "human_approved_total": 3,
+    "human_resolution_requests_total": 2,
+    "human_approved_total": 0,
     "human_rejected_total": 0,
     "manual_fix_total": 0,
-    "open_human_queue_total": 2
+    "open_human_queue_total": 5
   },
   "performance_metrics": {
-    "mttd_seconds": 5.46,
-    "mttr_seconds": 45.54,
-    "issues_detected_total": 37,
-    "issues_resolved_total": 32,
-    "issues_escalated_total": 5
+    "mttd_seconds": 5.24,
+    "mttr_seconds": 40.62,
+    "issues_detected_total": 34,
+    "issues_resolved_total": 27,
+    "issues_escalated_total": 7
   },
   "recent_breakdowns": {
     "routes": {
-      "local_similarity": 28,
-      "local_fallback": 9
+      "generated_local": 3,
+      "local_fallback": 31
     },
     "error_types": {
-      "invalid_payment_value": 4,
-      "missing_column": 6,
+      "duplicate_record": 3,
       "unknown_payment_type": 5,
-      "invalid_timestamp": 4,
-      "duplicate_record": 4,
-      "freight_outlier": 5,
-      "null_key": 5,
-      "orphan_record": 4
+      "invalid_timestamp": 6,
+      "freight_outlier": 2,
+      "orphan_record": 4,
+      "invalid_payment_value": 3,
+      "missing_column": 6,
+      "null_key": 5
     },
     "statuses": {
-      "resolved": 29,
-      "escalated": 5,
-      "approved": 3
+      "resolved": 27,
+      "escalated": 7
     },
     "datasets": {
-      "payments": 18,
-      "delivery": 14,
-      "orders": 5
+      "delivery": 13,
+      "payments": 12,
+      "orders": 9
     }
   },
   "recent_batches": [
     {
       "batch_id": "batch-006",
-      "started_at": "2026-04-10 21:30:37",
-      "batch_size": 15,
-      "status": "degraded",
-      "detected": 5,
-      "resolved": 5,
-      "escalated": 0
+      "started_at": "2026-04-11 02:01:15",
+      "batch_size": 14,
+      "status": "attention",
+      "detected": 8,
+      "resolved": 7,
+      "escalated": 1
     },
     {
       "batch_id": "batch-005",
-      "started_at": "2026-04-10 21:30:22",
+      "started_at": "2026-04-11 02:00:53",
       "batch_size": 15,
+      "status": "attention",
+      "detected": 6,
+      "resolved": 4,
+      "escalated": 2
+    },
+    {
+      "batch_id": "batch-004",
+      "started_at": "2026-04-11 02:00:29",
+      "batch_size": 10,
+      "status": "degraded",
+      "detected": 4,
+      "resolved": 4,
+      "escalated": 0
+    },
+    {
+      "batch_id": "batch-003",
+      "started_at": "2026-04-11 02:00:07",
+      "batch_size": 13,
       "status": "attention",
       "detected": 4,
       "resolved": 3,
       "escalated": 1
     },
     {
-      "batch_id": "batch-004",
-      "started_at": "2026-04-10 21:30:07",
-      "batch_size": 13,
-      "status": "attention",
-      "detected": 8,
-      "resolved": 7,
-      "escalated": 1
-    },
-    {
-      "batch_id": "batch-003",
-      "started_at": "2026-04-10 21:29:52",
-      "batch_size": 12,
-      "status": "attention",
-      "detected": 8,
-      "resolved": 7,
-      "escalated": 1
-    },
-    {
       "batch_id": "batch-002",
-      "started_at": "2026-04-10 21:29:37",
+      "started_at": "2026-04-11 01:59:44",
       "batch_size": 13,
       "status": "attention",
-      "detected": 5,
-      "resolved": 4,
+      "detected": 6,
+      "resolved": 5,
       "escalated": 1
     },
     {
       "batch_id": "batch-001",
-      "started_at": "2026-04-10 21:29:22",
-      "batch_size": 12,
+      "started_at": "2026-04-11 01:59:18",
+      "batch_size": 14,
       "status": "attention",
-      "detected": 7,
-      "resolved": 6,
-      "escalated": 1
+      "detected": 6,
+      "resolved": 4,
+      "escalated": 2
     }
   ],
   "open_escalations": [
     {
-      "error_id": "batch-004-002",
-      "batch_id": "batch-004",
+      "error_id": "batch-001-004",
+      "batch_id": "batch-001",
       "dataset": "delivery",
       "status": "pending",
       "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "974c1993ab8024d3ed16229183c2308d"
+      "proposed_value": "6fa204b6cf6dcfe6c9adca7dc53aa32a"
+    },
+    {
+      "error_id": "batch-002-006",
+      "batch_id": "batch-002",
+      "dataset": "orders",
+      "status": "pending",
+      "reason": "Restore blank primary key from clean source trace.",
+      "proposed_value": "948097deef559c742e7ce321e5e58919"
+    },
+    {
+      "error_id": "batch-003-002",
+      "batch_id": "batch-003",
+      "dataset": "orders",
+      "status": "pending",
+      "reason": "Restore blank primary key from clean source trace.",
+      "proposed_value": "a7cd6af6e0519313887b3c3a120f20ca"
     },
     {
       "error_id": "batch-005-004",
       "batch_id": "batch-005",
+      "dataset": "orders",
+      "status": "pending",
+      "reason": "Restore blank primary key from clean source trace.",
+      "proposed_value": "f2fa3795760c35b8c05fa8e2f09d5143"
+    },
+    {
+      "error_id": "batch-006-008",
+      "batch_id": "batch-006",
       "dataset": "delivery",
       "status": "pending",
       "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "90349f264a3d6a2525a34598d09dda6b"
+      "proposed_value": "2711a938db643b3f0b62ee2c8a2784aa"
     }
   ],
   "downloads": {
     "report_download_total": 0,
-    "json_path": "/Users/aryaapatil/Desktop/MPR2/New-project/data/logs/latest_analysis_report.json",
-    "markdown_path": "/Users/aryaapatil/Desktop/MPR2/New-project/data/logs/latest_analysis_report.md"
+    "json_path": "/Users/garv/Documents/New project/data/logs/latest_analysis_report.json",
+    "markdown_path": "/Users/garv/Documents/New project/data/logs/latest_analysis_report.md"
   }
 }
