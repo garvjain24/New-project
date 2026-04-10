@@ -106,6 +106,13 @@ class Handler(BaseHTTPRequestHandler):
                     payload.get("error_id", ""),
                     payload.get("manual_value", ""),
                 )
+            elif payload.get("action") == "nl-fix-escalation":
+                result = ENGINE.nl_fix_escalation(
+                    payload.get("error_id", ""),
+                    payload.get("instruction", ""),
+                )
+                self._json({"ok": True, "state": ENGINE.snapshot(), "nl_result": result})
+                return
             elif payload.get("action") == "rollback-error":
                 ENGINE.rollback_error(payload.get("error_id", ""))
             elif payload.get("action") == "rollback-batch":

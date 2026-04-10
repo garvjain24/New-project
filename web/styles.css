@@ -690,6 +690,253 @@ tbody tr:nth-child(odd) {
   }
 }
 
+/* ── NL Fix UI ────────────────────────────────────────── */
+
+.nl-fix-container {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(95, 225, 255, 0.04);
+  border: 1px solid rgba(95, 225, 255, 0.12);
+}
+
+.nl-fix-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.88rem;
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.nl-fix-icon {
+  font-size: 1.2rem;
+}
+
+.nl-fix-textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 0.92rem;
+  resize: vertical;
+  min-height: 48px;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.nl-fix-textarea:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(95, 225, 255, 0.12);
+}
+
+.nl-fix-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.nl-submit-btn {
+  background: linear-gradient(135deg, var(--cyan), var(--mint));
+  color: #04111f;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nl-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.nl-btn-icon {
+  font-size: 1.1rem;
+}
+
+.nl-btn-spin {
+  display: inline-block;
+  animation: nl-spin 0.8s linear infinite;
+}
+
+.nl-reasoning-panel {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(95, 225, 255, 0.08);
+}
+
+.nl-reasoning-complete {
+  border-color: rgba(117, 245, 200, 0.15);
+  background: rgba(117, 245, 200, 0.04);
+}
+
+.nl-reasoning-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+.nl-reasoning-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(95, 225, 255, 0.3);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: nl-spin 0.7s linear infinite;
+}
+
+.nl-done-icon {
+  font-size: 1.1rem;
+}
+
+.nl-reasoning-steps {
+  display: grid;
+  gap: 10px;
+}
+
+.nl-step {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nl-step-animate {
+  animation: nl-fade-in 0.35s ease-out;
+}
+
+.nl-step-done {
+  opacity: 0.85;
+}
+
+.nl-step-badge {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--mint));
+  color: #04111f;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.nl-step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.nl-step-phase {
+  font-weight: 600;
+  font-size: 0.84rem;
+  color: var(--mint);
+  margin-bottom: 4px;
+}
+
+.nl-step-thought {
+  font-size: 0.84rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.nl-step-result {
+  font-size: 0.84rem;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.nl-step-time {
+  font-size: 0.72rem;
+  color: rgba(147, 167, 200, 0.6);
+  margin-top: 4px;
+}
+
+.nl-reasoning-result {
+  margin-top: 14px;
+}
+
+.nl-result-final {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(117, 245, 200, 0.08);
+  border: 1px solid rgba(117, 245, 200, 0.15);
+  font-size: 0.88rem;
+  color: var(--mint);
+}
+
+.nl-result-final strong {
+  color: var(--text);
+}
+
+.nl-result-final div {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.nl-result-skip {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 209, 102, 0.08);
+  border: 1px solid rgba(255, 209, 102, 0.15);
+  font-size: 0.88rem;
+  color: var(--amber);
+}
+
+.nl-error {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 122, 144, 0.1);
+  border: 1px solid rgba(255, 122, 144, 0.2);
+  font-size: 0.88rem;
+  color: var(--rose);
+}
+
+.nl-shake {
+  animation: nl-shake 0.4s ease;
+}
+
+@keyframes nl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes nl-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nl-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
 @media (max-width: 1040px) {
   .hero,
   .dashboard-grid,

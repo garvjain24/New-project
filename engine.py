@@ -24,6 +24,7 @@ from pipeline_utils import (
 from local_resolver import LocalSimilarityResolver
 from llm_client import OpenRouterClient
 from llm_simulator import LLMSimulator
+from nl_interpreter import NLFixInterpreter
 
 class SimulationEngine:
     def __init__(self):
@@ -32,6 +33,7 @@ class SimulationEngine:
         self.all_escalations = []
         self.local_resolver = LocalSimilarityResolver(LOCAL_PLAYBOOKS)
         self.simulator = LLMSimulator()
+        self.nl_interpreter = NLFixInterpreter()
         self.openrouter = OpenRouterClient()
         self.started_at = time.time()
         self.last_crash_at = None
@@ -1184,6 +1186,105 @@ Generated at: {report['generated_at']}
                 approval["manual_fixed_at"],
             )
             self._write_latest_logs()
+
+    def nl_fix_escalation(self, error_id, instruction):
+        """Parse a natural language instruction and apply the fix."""
+        with self.lock:
+            approval = self._find_approval(error_id, require_pending=True)
+            batch = self._find_batch_record(approval["batch_id"]) if approval else None
+            if not approval or not batch:
+                raise ValueError("Pending approval not found.")
+
+            context = {
+                "error_id": error_id,
+                "dataset": approval.get("dataset"),
+                "column": approval.get("column"),
+                "row_index": approval.get("row_index"),
+                "current_value": approval.get("current_value"),
+                "proposed_value": approval.get("proposed_value"),
+                "order_id": approval.get("order_id"),
+                "reason": approval.get("reason"),
+            }
+
+            self.telemetry["llm_calls_total"] += 1
+            self.telemetry["simulator_calls_total"] += 1
+            result = self.nl_interpreter.interpret(instruction, context)
+            self.telemetry["llm_success_total"] += 1
+            self.telemetry["simulator_hits_total"] += 1
+
+            if result.get("skip"):
+                return result
+
+            resolved_value = result.get("resolved_value")
+            if not resolved_value:
+                raise ValueError("Could not determine a fix from the instruction.")
+
+            dataset = approval["dataset"]
+            row_index = approval["row_index"]
+            log = self._find_log_in_batch(batch, error_id)
+            if log is None:
+                raise ValueError("Resolution log not found.")
+
+            if resolved_value == "__DELETE__":
+                if row_index is not None and row_index < len(batch["datasets"]["healed"][dataset]):
+                    batch["datasets"]["healed"][dataset].pop(row_index)
+            else:
+                if row_index is not None and row_index < len(batch["datasets"]["healed"][dataset]):
+                    if approval["column"] == "order_id":
+                        batch["datasets"]["healed"][dataset][row_index]["order_id"] = resolved_value
+                    elif approval["column"] == "row":
+                        order_id = resolved_value
+                        clean_rows = batch["datasets"]["clean"].get(dataset, [])
+                        clean_row = next((r for r in clean_rows if r.get("order_id") == order_id), None)
+                        if clean_row:
+                            batch["datasets"]["healed"][dataset][row_index] = deepcopy(clean_row)
+                        else:
+                            batch["datasets"]["healed"][dataset][row_index]["order_id"] = resolved_value
+                    else:
+                        batch["datasets"]["healed"][dataset][row_index][approval["column"]] = resolved_value
+
+            approval["status"] = "manually_fixed"
+            approval["manual_value"] = resolved_value
+            approval["manual_fixed_at"] = self._now_text()
+            approval["nl_instruction"] = instruction
+            approval["nl_reasoning"] = result
+            approval["history"].append({
+                "action": "nl_fix",
+                "at": approval["manual_fixed_at"],
+                "instruction": instruction,
+                "value": resolved_value,
+            })
+            escalation = self._find_escalation(error_id)
+            if escalation:
+                escalation.update(deepcopy(approval))
+            self.telemetry["manual_fix_total"] += 1
+
+            log["status"] = "manually_fixed"
+            log["resolver"] = "NL Interpreter (Simulated LLM)"
+            log["approval_required"] = False
+            log["resolved_at"] = approval["manual_fixed_at"]
+            log["resolution_action"] = f"NL Fix: {result.get('action_description', instruction)}"
+            log["resolved_value"] = resolved_value
+            log["agent_route"] = "nl_interpreted"
+            log["agent_reason"] = result.get("action_description", "")
+            log["resolution_latency_sec"] = max(log.get("resolution_latency_sec", 0), 120)
+
+            batch["summary"]["resolved"] = sum(
+                1 for item in batch["detailed_logs"] if item["status"] in {"resolved", "approved", "manually_fixed"}
+            )
+            batch["summary"]["escalated"] = sum(
+                1 for item in batch["detailed_logs"] if item["status"] == "escalated"
+            )
+            batch["status"] = "healthy" if batch["summary"]["escalated"] == 0 else "attention"
+            self._update_metrics_from_history()
+            self._prepend_event(
+                "approval",
+                f"{error_id} | NL fix: {result.get('detected_intent', 'unknown')} \u2192 {resolved_value}",
+                approval["manual_fixed_at"],
+            )
+            self._write_latest_logs()
+
+            return result
 
     def loop(self):
         while True:

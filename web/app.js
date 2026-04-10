@@ -597,7 +597,8 @@ function renderApprovals() {
     const card = document.createElement("div");
     card.className = "history-card";
     const pending = approval.status === "pending";
-    const manualId = `manual-${approval.error_id}`;
+    const nlId = `nl-${approval.error_id}`;
+    const reasoningId = `reasoning-${approval.error_id}`;
     card.innerHTML = `
       <strong>${escapeHtml(approval.error_id)}</strong>
       <div>Batch: ${escapeHtml(approval.batch_id ?? approval.cycle_id ?? "-")}</div>
@@ -607,17 +608,157 @@ function renderApprovals() {
       <div>Reason: ${escapeHtml(approval.reason)}</div>
       <div>Status: ${escapeHtml(approval.status)}</div>
       ${pending ? `
-        <div class="approval-actions">
-          <button class="approve-btn" data-error-id="${escapeHtml(approval.error_id)}">Approve</button>
-          <button class="reject-btn" data-error-id="${escapeHtml(approval.error_id)}">Reject</button>
+        <div class="nl-fix-container" id="nl-container-${escapeHtml(approval.error_id)}">
+          <div class="nl-fix-header">
+            <span class="nl-fix-icon">🤖</span>
+            <span>Describe how to fix this error in plain English</span>
+          </div>
+          <textarea 
+            id="${escapeHtml(nlId)}" 
+            class="nl-fix-textarea" 
+            placeholder="e.g. &quot;restore the original order_id from clean data&quot; or &quot;set to delivered&quot; or &quot;delete this row&quot;"
+            rows="2"
+          ></textarea>
+          <div class="nl-fix-actions">
+            <button class="nl-submit-btn" data-error-id="${escapeHtml(approval.error_id)}" data-nl-id="${escapeHtml(nlId)}">
+              <span class="nl-btn-icon">⚡</span> Send to Agent
+            </button>
+            <button class="approve-btn ghost" data-error-id="${escapeHtml(approval.error_id)}">Approve Proposed</button>
+            <button class="reject-btn ghost" data-error-id="${escapeHtml(approval.error_id)}">Reject</button>
+          </div>
+          <div class="nl-reasoning-panel" id="${escapeHtml(reasoningId)}" style="display:none;">
+            <div class="nl-reasoning-header">
+              <span class="nl-reasoning-spinner"></span>
+              <span>Agent Processing</span>
+            </div>
+            <div class="nl-reasoning-steps"></div>
+            <div class="nl-reasoning-result"></div>
+          </div>
         </div>
-        <div class="manual-fix-row">
-          <input id="${escapeHtml(manualId)}" class="filter-input manual-input" placeholder="Enter manual fix value" />
-          <button class="manual-fix-btn" data-error-id="${escapeHtml(approval.error_id)}" data-input-id="${escapeHtml(manualId)}">Apply Manual Fix</button>
+      ` : ""}
+      ${approval.nl_reasoning ? `
+        <div class="nl-reasoning-panel nl-reasoning-complete">
+          <div class="nl-reasoning-header">
+            <span class="nl-done-icon">✅</span>
+            <span>Agent Reasoning (completed)</span>
+          </div>
+          <div class="nl-reasoning-steps">
+            ${approval.nl_reasoning.reasoning_steps.map((step) => `
+              <div class="nl-step nl-step-done">
+                <div class="nl-step-badge">${step.step}</div>
+                <div class="nl-step-body">
+                  <div class="nl-step-phase">${escapeHtml(step.phase)}</div>
+                  <div class="nl-step-thought">${escapeHtml(step.thought)}</div>
+                  <div class="nl-step-result">${escapeHtml(step.result)}</div>
+                  <div class="nl-step-time">${step.duration_ms}ms</div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+          <div class="nl-reasoning-result nl-result-final">
+            <strong>Result:</strong> ${escapeHtml(approval.nl_reasoning.action_description)}
+            <div>Confidence: ${(approval.nl_reasoning.confidence * 100).toFixed(0)}% | Intent: ${escapeHtml(approval.nl_reasoning.detected_intent)}</div>
+          </div>
         </div>
       ` : ""}
     `;
     host.appendChild(card);
+  });
+
+  // Wire NL submit buttons
+  document.querySelectorAll(".nl-submit-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const errorId = button.dataset.errorId;
+      const textarea = document.getElementById(button.dataset.nlId);
+      const instruction = textarea?.value?.trim();
+      if (!instruction) {
+        textarea.classList.add("nl-shake");
+        setTimeout(() => textarea.classList.remove("nl-shake"), 500);
+        return;
+      }
+
+      const reasoningPanel = document.getElementById(`reasoning-${errorId}`);
+      const stepsHost = reasoningPanel.querySelector(".nl-reasoning-steps");
+      const resultHost = reasoningPanel.querySelector(".nl-reasoning-result");
+      reasoningPanel.style.display = "block";
+      stepsHost.innerHTML = "";
+      resultHost.innerHTML = "";
+
+      // Disable button
+      button.disabled = true;
+      button.innerHTML = '<span class="nl-btn-icon nl-btn-spin">⚡</span> Processing...';
+
+      try {
+        const response = await fetch("/api/action", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "nl-fix-escalation", error_id: errorId, instruction }),
+        });
+        const data = await response.json();
+
+        if (!data.ok) {
+          resultHost.innerHTML = `<div class="nl-error">Error: ${escapeHtml(data.error)}</div>`;
+          button.disabled = false;
+          button.innerHTML = '<span class="nl-btn-icon">⚡</span> Send to Agent';
+          return;
+        }
+
+        const nlResult = data.nl_result;
+        if (!nlResult) {
+          resultHost.innerHTML = '<div class="nl-error">No reasoning returned.</div>';
+          button.disabled = false;
+          button.innerHTML = '<span class="nl-btn-icon">⚡</span> Send to Agent';
+          return;
+        }
+
+        // Animate reasoning steps one by one
+        const steps = nlResult.reasoning_steps || [];
+        for (let i = 0; i < steps.length; i++) {
+          const step = steps[i];
+          await new Promise((resolve) => setTimeout(resolve, step.duration_ms));
+          const stepEl = document.createElement("div");
+          stepEl.className = "nl-step nl-step-animate";
+          stepEl.innerHTML = `
+            <div class="nl-step-badge">${step.step}</div>
+            <div class="nl-step-body">
+              <div class="nl-step-phase">${escapeHtml(step.phase)}</div>
+              <div class="nl-step-thought">${escapeHtml(step.thought)}</div>
+              <div class="nl-step-result">${escapeHtml(step.result)}</div>
+              <div class="nl-step-time">${step.duration_ms}ms</div>
+            </div>
+          `;
+          stepsHost.appendChild(stepEl);
+        }
+
+        // Show final result
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const spinner = reasoningPanel.querySelector(".nl-reasoning-spinner");
+        if (spinner) spinner.className = "nl-done-icon";
+        if (spinner) spinner.textContent = nlResult.skip ? "⏭️" : "✅";
+
+        if (nlResult.skip) {
+          resultHost.innerHTML = `<div class="nl-result-skip">Skipped — error remains escalated.</div>`;
+        } else {
+          resultHost.innerHTML = `
+            <div class="nl-result-final">
+              <strong>Applied:</strong> ${escapeHtml(nlResult.action_description)}
+              <div>Confidence: ${(nlResult.confidence * 100).toFixed(0)}% | Intent: ${escapeHtml(nlResult.detected_intent)} | Thinking: ${nlResult.simulated_thinking_ms}ms</div>
+            </div>
+          `;
+        }
+
+        // Update state
+        if (data.state) {
+          state.payload = data.state;
+          render();
+        }
+      } catch (err) {
+        resultHost.innerHTML = `<div class="nl-error">Network error: ${escapeHtml(err.message)}</div>`;
+        button.disabled = false;
+        button.innerHTML = '<span class="nl-btn-icon">⚡</span> Send to Agent';
+      }
+    });
   });
 
   document.querySelectorAll(".approve-btn").forEach((button) => {
@@ -628,18 +769,6 @@ function renderApprovals() {
   document.querySelectorAll(".reject-btn").forEach((button) => {
     button.addEventListener("click", () => {
       postAction({ action: "reject-escalation", error_id: button.dataset.errorId });
-    });
-  });
-  document.querySelectorAll(".manual-fix-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const input = document.getElementById(button.dataset.inputId);
-      const value = input?.value?.trim();
-      if (!value) return;
-      postAction({
-        action: "manual-fix-escalation",
-        error_id: button.dataset.errorId,
-        manual_value: value,
-      });
     });
   });
 }
@@ -995,7 +1124,12 @@ function render() {
   renderComparisonTable();
   renderResolvedIssuesTable();
   renderRecordTrail();
-  renderApprovals();
+  // Skip approval re-render if user is typing in the NL fix textarea
+  const activeEl = document.activeElement;
+  const isTypingNLFix = activeEl && activeEl.classList.contains("nl-fix-textarea");
+  if (!isTypingNLFix) {
+    renderApprovals();
+  }
 }
 
 function updateCountdown() {
