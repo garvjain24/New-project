@@ -1,0 +1,259 @@
+{
+  "batch_id": "batch-001",
+  "detailed_logs": [
+    {
+      "error_id": "batch-001-001",
+      "detected_at": "2026-04-10 18:46:43",
+      "resolved_at": "2026-04-10 18:46:43",
+      "detection_latency_sec": 6,
+      "dataset": "delivery",
+      "error_type": "duplicate_record",
+      "severity": "medium",
+      "row_index": 13,
+      "column": null,
+      "finding": "A duplicate record is present in the dataset.",
+      "dirty_value": null,
+      "original_value": null,
+      "order_id": "7c18eddfcd24680d80a502346221614e",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Removed duplicate rows and kept the first unique copy.",
+      "resolved_value": "14 unique rows remain",
+      "approval_required": false,
+      "resolution_latency_sec": 7,
+      "agent_route": "local_fallback",
+      "agent_reason": "No LLM available or no strong local match; using conservative local rules.",
+      "retrieved_context": [
+        {
+          "source": "playbook",
+          "error_type": "duplicate_record",
+          "dataset": "",
+          "finding": "row content is duplicated and primary keys still allow safe collapse",
+          "strategy": "deduplicate keeping first unique row",
+          "status": "template",
+          "score": 0.0729
+        },
+        {
+          "source": "playbook",
+          "error_type": "null_key",
+          "dataset": "",
+          "finding": "primary key is blank or ambiguous",
+          "strategy": "require human review unless a deterministic local trace exists",
+          "status": "template",
+          "score": 0.068
+        },
+        {
+          "source": "playbook",
+          "error_type": "orphan_record",
+          "dataset": "",
+          "finding": "foreign key no longer matches a clean order",
+          "strategy": "restore from trusted local store if confident else escalate",
+          "status": "template",
+          "score": 0.0509
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-001-002",
+      "detected_at": "2026-04-10 18:46:43",
+      "resolved_at": "2026-04-10 18:46:43",
+      "detection_latency_sec": 2,
+      "dataset": "payments",
+      "error_type": "null_key",
+      "severity": "critical",
+      "row_index": 8,
+      "column": "order_id",
+      "finding": "Blank order_id prevents deterministic joins.",
+      "dirty_value": "",
+      "original_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "order_id": "e346cd9299371b18c0b28e8e29a5e376",
+      "resolver": "Human Ops",
+      "status": "escalated",
+      "resolution_action": "Waiting for human approval to restore the primary key.",
+      "resolved_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "approval_required": true,
+      "resolution_latency_sec": 180,
+      "agent_route": "local_fallback",
+      "agent_reason": "No LLM available or no strong local match; using conservative local rules.",
+      "retrieved_context": [
+        {
+          "source": "playbook",
+          "error_type": "null_key",
+          "dataset": "",
+          "finding": "primary key is blank or ambiguous",
+          "strategy": "require human review unless a deterministic local trace exists",
+          "status": "template",
+          "score": 0.2529
+        },
+        {
+          "source": "playbook",
+          "error_type": "freight_outlier",
+          "dataset": "",
+          "finding": "freight is unrealistic but order_id is available",
+          "strategy": "replace with trusted freight value from local store",
+          "status": "template",
+          "score": 0.0626
+        },
+        {
+          "source": "playbook",
+          "error_type": "unknown_payment_type",
+          "dataset": "",
+          "finding": "payment type is unsupported but order_id is available",
+          "strategy": "restore supported payment type from trusted local store",
+          "status": "template",
+          "score": 0.0575
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": "human_approval"
+    },
+    {
+      "error_id": "batch-001-003",
+      "detected_at": "2026-04-10 18:46:43",
+      "resolved_at": "2026-04-10 18:46:43",
+      "detection_latency_sec": 4,
+      "dataset": "payments",
+      "error_type": "orphan_record",
+      "severity": "high",
+      "row_index": 6,
+      "column": "order_id",
+      "finding": "`orphan-1611` does not exist in the clean orders store.",
+      "dirty_value": "orphan-1611",
+      "original_value": "10c320f977c6a18f91b2d14be13128c6",
+      "order_id": "10c320f977c6a18f91b2d14be13128c6",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Replaced orphan record with matching clean record from standard store.",
+      "resolved_value": "10c320f977c6a18f91b2d14be13128c6",
+      "approval_required": false,
+      "resolution_latency_sec": 10,
+      "agent_route": "local_fallback",
+      "agent_reason": "No LLM available or no strong local match; using conservative local rules.",
+      "retrieved_context": [
+        {
+          "source": "playbook",
+          "error_type": "orphan_record",
+          "dataset": "",
+          "finding": "foreign key no longer matches a clean order",
+          "strategy": "restore from trusted local store if confident else escalate",
+          "status": "template",
+          "score": 0.1407
+        },
+        {
+          "source": "playbook",
+          "error_type": "invalid_timestamp",
+          "dataset": "",
+          "finding": "timestamp format is invalid",
+          "strategy": "restore timestamp from trusted local store",
+          "status": "template",
+          "score": 0.0227
+        },
+        {
+          "source": "playbook",
+          "error_type": "missing_column",
+          "dataset": "",
+          "finding": "column is recoverable from local canonical data",
+          "strategy": "reconstruct missing field from trusted local store",
+          "status": "template",
+          "score": 0.0204
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-001-004",
+      "detected_at": "2026-04-10 18:46:43",
+      "resolved_at": "2026-04-10 18:46:43",
+      "detection_latency_sec": 4,
+      "dataset": "payments",
+      "error_type": "missing_column",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "finding": "Required column `payment_value` is missing from payments.",
+      "dirty_value": null,
+      "original_value": null,
+      "order_id": null,
+      "resolver": "Human Ops",
+      "status": "escalated",
+      "resolution_action": "Could not reconstruct `payment_value` for every row.",
+      "resolved_value": null,
+      "approval_required": true,
+      "resolution_latency_sec": 120,
+      "agent_route": "local_similarity",
+      "agent_reason": "Matched local playbook/history with enough confidence.",
+      "retrieved_context": [
+        {
+          "source": "playbook",
+          "error_type": "missing_column",
+          "dataset": "",
+          "finding": "column is recoverable from local canonical data",
+          "strategy": "reconstruct missing field from trusted local store",
+          "status": "template",
+          "score": 0.3068
+        },
+        {
+          "source": "playbook",
+          "error_type": "invalid_payment_value",
+          "dataset": "",
+          "finding": "payment_value is malformed or non-numeric",
+          "strategy": "normalize text to numeric if obvious else restore from trusted local store",
+          "status": "template",
+          "score": 0.098
+        },
+        {
+          "source": "playbook",
+          "error_type": "freight_outlier",
+          "dataset": "",
+          "finding": "freight is unrealistic but order_id is available",
+          "strategy": "replace with trusted freight value from local store",
+          "status": "template",
+          "score": 0.0558
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": "human_resolution"
+    }
+  ],
+  "pending_approvals": [
+    {
+      "error_id": "batch-001-002",
+      "cycle_id": "batch-001",
+      "dataset": "payments",
+      "row_index": 8,
+      "column": "order_id",
+      "order_id": "e346cd9299371b18c0b28e8e29a5e376",
+      "current_value": "",
+      "proposed_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "reason": "Restore blank primary key from clean source trace.",
+      "status": "pending",
+      "proposed_field": "order_id",
+      "request_kind": "human_approval",
+      "batch_id": "batch-001",
+      "created_at": "2026-04-10 18:46:43",
+      "history": []
+    }
+  ],
+  "all_escalations": [
+    {
+      "error_id": "batch-001-002",
+      "cycle_id": "batch-001",
+      "dataset": "payments",
+      "row_index": 8,
+      "column": "order_id",
+      "order_id": "e346cd9299371b18c0b28e8e29a5e376",
+      "current_value": "",
+      "proposed_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "reason": "Restore blank primary key from clean source trace.",
+      "status": "pending",
+      "proposed_field": "order_id",
+      "request_kind": "human_approval",
+      "batch_id": "batch-001",
+      "created_at": "2026-04-10 18:46:43",
+      "history": []
+    }
+  ]
+}

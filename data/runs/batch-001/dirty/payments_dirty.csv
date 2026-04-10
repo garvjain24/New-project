@@ -1,0 +1,15 @@
+order_id,payment_type,payment_installments
+e69bfb5eb88e0ed6a785585b27e16dbf,voucher,1
+203096f03d82e0dffbc41ebc2e2bcfb7,boleto,1
+8563039e855156e48fccee4d611a3196,credit_card,4
+5820a1100976432c7968a52da59e9364,credit_card,1
+686541986ecfb7d9296eb67719973bf0,credit_card,1
+634e8f4c0f6744a626f77f39770ac6aa,voucher,1
+orphan-1611,credit_card,3
+e4de6d53ecff736bc68804b0b6e9f635,boleto,1
+,credit_card,3
+01a75ac3dd000b7628a684be97c29234,credit_card,5
+b01875821b8dcb6abc61776f0f971bce,credit_card,10
+b16cec67cb3f5a4bb31abe8988b43d19,credit_card,2
+e6190dea235662449d160357e46eaec8,credit_card,2
+7c18eddfcd24680d80a502346221614e,credit_card,10

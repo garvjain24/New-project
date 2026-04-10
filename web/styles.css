@@ -46,6 +46,22 @@ body::before {
   padding: 28px 0 40px;
 }
 
+.page-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.nav-link {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.nav-link.active {
+  background: linear-gradient(135deg, #ffd166, #5fe1ff);
+}
+
 .hero,
 .panel,
 .pipeline-panel,
@@ -258,9 +274,29 @@ button.ghost {
   margin-top: 18px;
 }
 
+.record-grid {
+  grid-template-columns: 0.8fr 1.2fr;
+}
+
+.analytics-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .panel {
   border-radius: 28px;
   padding: 24px;
+}
+
+.full-width {
+  margin-top: 18px;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
 }
 
 .summary-grid {
@@ -287,6 +323,19 @@ button.ghost {
   display: block;
   margin-top: 8px;
   font-size: 1.4rem;
+}
+
+.ratio-grid {
+  margin-top: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ratio-item strong {
+  color: var(--cyan);
+}
+
+.analytics-card-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .mini-columns {
@@ -338,10 +387,148 @@ button.ghost {
   grid-column: 1 / -1;
 }
 
+.chart-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.chart-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.chart-toggle.active {
+  background: linear-gradient(135deg, var(--cyan), var(--mint));
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.chart-card {
+  border-radius: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0.75;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.chart-card.chart-focus {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.chart {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.chart-empty {
+  color: var(--muted);
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 64px;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar-label,
+.bar-value {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.bar-track {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(95, 225, 255, 0.24);
+}
+
 .dataset-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  margin-top: 18px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.toolbar.stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.filter-input {
+  width: min(360px, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border-radius: 16px;
+  padding: 12px 14px;
+  font: inherit;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.suggestion-chip,
+.approve-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.reject-btn,
+.manual-fix-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.approval-actions,
+.manual-fix-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.manual-input {
+  max-width: 280px;
+}
+
+.print-card {
+  border-color: rgba(95, 225, 255, 0.2);
+}
+
+.record-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 18px;
 }
 
@@ -429,9 +616,15 @@ tbody tr:nth-child(odd) {
 @media (max-width: 1040px) {
   .hero,
   .dashboard-grid,
+  .analytics-grid,
+  .record-grid,
   .mini-columns,
   .stats-grid,
-  .summary-grid {
+  .summary-grid,
+  .ratio-grid,
+  .analytics-card-grid,
+  .chart-grid,
+  .record-summary {
     grid-template-columns: 1fr;
   }
 
@@ -443,5 +636,14 @@ tbody tr:nth-child(odd) {
     height: 34px;
     width: 8px;
     margin: 0 auto;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bar-row {
+    grid-template-columns: 1fr;
   }
 }

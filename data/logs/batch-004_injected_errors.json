@@ -1,0 +1,89 @@
+{
+  "batch_id": "batch-004",
+  "injected_errors": [
+    {
+      "error_id": "batch-004-001",
+      "cycle_id": "batch-004",
+      "type": "null_key",
+      "dataset": "payments",
+      "severity": "critical",
+      "row_index": 0,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "7206b86ea789983f7a273ea7fa0bc2a8",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "batch-004-002",
+      "cycle_id": "batch-004",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 6,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "25.66",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-004-003",
+      "cycle_id": "batch-004",
+      "type": "duplicate_record",
+      "dataset": "delivery",
+      "severity": "medium",
+      "row_index": 4,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-004-004",
+      "cycle_id": "batch-004",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 11,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-004-005",
+      "cycle_id": "batch-004",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 8,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "b2bd1f09c1b8a4a36940f6f6e49d5dec",
+      "dirty_value": "orphan-6250"
+    },
+    {
+      "error_id": "batch-004-006",
+      "cycle_id": "batch-004",
+      "type": "invalid_payment_value",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 9,
+      "column": "payment_value",
+      "message": "Payment value was converted from numeric to text.",
+      "original_value": "43.29",
+      "dirty_value": "forty two"
+    },
+    {
+      "error_id": "batch-004-007",
+      "cycle_id": "batch-004",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 0,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2018-01-07 21:44:54",
+      "dirty_value": "2026/99/99 88:61:00"
+    }
+  ]
+}

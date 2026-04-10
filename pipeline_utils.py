@@ -248,6 +248,8 @@ def generate_dirty_dataset(clean_dataset, cycle_id, error_count=None, rng=None):
         rows, idx = pick_row("payments")
         if idx is None:
             return
+        if "payment_value" not in rows[idx]:
+            return
         original = rows[idx]["payment_value"]
         dirty_value = rng.choice(["ten thousand", "NaN??", "forty two"])
         rows[idx]["payment_value"] = dirty_value
@@ -289,6 +291,8 @@ def generate_dirty_dataset(clean_dataset, cycle_id, error_count=None, rng=None):
         rows, idx = pick_row("orders")
         if idx is None:
             return
+        if "order_purchase_timestamp" not in rows[idx]:
+            return
         original = rows[idx]["order_purchase_timestamp"]
         dirty_value = "2026/99/99 88:61:00"
         rows[idx]["order_purchase_timestamp"] = dirty_value
@@ -309,6 +313,8 @@ def generate_dirty_dataset(clean_dataset, cycle_id, error_count=None, rng=None):
         rows, idx = pick_row("delivery")
         if idx is None:
             return
+        if "freight_value" not in rows[idx]:
+            return
         original = rows[idx]["freight_value"]
         dirty_value = "99999.99"
         rows[idx]["freight_value"] = dirty_value
@@ -328,6 +334,8 @@ def generate_dirty_dataset(clean_dataset, cycle_id, error_count=None, rng=None):
     def unknown_payment_type():
         rows, idx = pick_row("payments")
         if idx is None:
+            return
+        if "payment_type" not in rows[idx]:
             return
         original = rows[idx]["payment_type"]
         dirty_value = "telepathy"

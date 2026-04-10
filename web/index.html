@@ -13,8 +13,8 @@
           <p class="eyebrow">Agentic Demo Control Room</p>
           <h1>Self-Healing Data Pipeline Simulation</h1>
           <p class="hero-text">
-            Clean records flow in from a standard database every 15 seconds. Random
-            pipeline failures are injected, detected, healed, or escalated in real time.
+            Explore the live system through overview, clean data, resolved data,
+            record trails, and a human approval queue for escalated fixes.
           </p>
         </div>
         <div class="hero-status">
@@ -30,9 +30,18 @@
         </div>
       </header>
 
+      <nav class="page-nav">
+        <button class="nav-link active" data-view="overview">Overview</button>
+        <button class="nav-link" data-view="analytics">Analytics</button>
+        <button class="nav-link" data-view="clean">Clean Data</button>
+        <button class="nav-link" data-view="resolved">Resolved Data</button>
+        <button class="nav-link" data-view="trail">Record Trail</button>
+        <button class="nav-link" data-view="approvals">Human Approvals</button>
+      </nav>
+
       <section class="stats-grid">
         <article class="stat-card">
-          <span>Total Cycles</span>
+          <span>Total Batches</span>
           <strong id="metric-cycles">0</strong>
         </article>
         <article class="stat-card">
@@ -49,106 +58,281 @@
         </article>
       </section>
 
-      <section class="pipeline-panel">
-        <div class="pipeline-header">
-          <div>
-            <p class="eyebrow">Live Flow</p>
-            <h2>Streaming pipeline stages</h2>
-          </div>
-          <div class="pill" id="cycle-badge">Waiting for cycle</div>
-        </div>
-        <div class="pipeline-track">
-          <div class="node active">
-            <span>Source DB</span>
-            <strong>Orders / Payments / Delivery</strong>
-          </div>
-          <div class="beam"></div>
-          <div class="node warn">
-            <span>Validation</span>
-            <strong>Failure Detection</strong>
-          </div>
-          <div class="beam"></div>
-          <div class="node success">
-            <span>Agent Diagnosis</span>
-            <strong>Auto-Healing</strong>
-          </div>
-          <div class="beam"></div>
-          <div class="node danger">
-            <span>Escalation</span>
-            <strong>Human Review Queue</strong>
-          </div>
-        </div>
-      </section>
+      <main>
+        <section class="view active" data-view-panel="overview">
+          <section class="pipeline-panel">
+            <div class="pipeline-header">
+              <div>
+                <p class="eyebrow">Live Flow</p>
+                <h2>Streaming pipeline stages</h2>
+              </div>
+              <div class="pill" id="cycle-badge">Waiting for cycle</div>
+            </div>
+            <div class="pipeline-track">
+              <div class="node active">
+                <span>Source DB</span>
+                <strong>Orders / Payments / Delivery</strong>
+              </div>
+              <div class="beam"></div>
+              <div class="node warn">
+                <span>Validation</span>
+                <strong>Failure Detection</strong>
+              </div>
+              <div class="beam"></div>
+              <div class="node success">
+                <span>Agent Diagnosis</span>
+                <strong>Auto-Healing</strong>
+              </div>
+              <div class="beam"></div>
+              <div class="node danger">
+                <span>Escalation</span>
+                <strong>Human Review Queue</strong>
+              </div>
+            </div>
+          </section>
 
-      <main class="dashboard-grid">
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Cycle Summary</p>
-              <h2>Latest simulation batch</h2>
-            </div>
-          </div>
-          <div id="summary-grid" class="summary-grid"></div>
-          <div class="mini-columns">
-            <div>
-              <h3>Injected Failures</h3>
-              <ul id="injected-list" class="event-list compact"></ul>
-            </div>
-            <div>
-              <h3>Resolution Logs</h3>
-              <ul id="audit-list" class="event-list compact"></ul>
-            </div>
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Cycle Summary</p>
+                  <h2>Latest processed batch</h2>
+                </div>
+              </div>
+              <div id="summary-grid" class="summary-grid"></div>
+              <div id="ratio-grid" class="summary-grid ratio-grid"></div>
+              <div class="mini-columns">
+                <div>
+                  <h3>Injected Failures</h3>
+                  <ul id="injected-list" class="event-list compact"></ul>
+                </div>
+                <div>
+                  <h3>Resolution Logs</h3>
+                  <ul id="audit-list" class="event-list compact"></ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Analytics</p>
+                  <h2>MTTD, MTTR and health ratios</h2>
+                </div>
+              </div>
+              <div class="chart-toolbar">
+                <button class="chart-toggle active" data-chart-view="trend">Trend</button>
+                <button class="chart-toggle" data-chart-view="distribution">Distribution</button>
+              </div>
+              <div class="chart-grid">
+                <div class="chart-card">
+                  <h3>Batch Error Trend</h3>
+                  <div id="trend-chart" class="chart"></div>
+                </div>
+                <div class="chart-card">
+                  <h3>Error Type Mix</h3>
+                  <div id="distribution-chart" class="chart"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Error Search</p>
+                  <h2>Find one error and print it</h2>
+                </div>
+              </div>
+              <div class="toolbar">
+                <input id="error-search" class="filter-input" placeholder="Search error id like batch-008-001 or search by type/status" />
+                <button id="print-error-btn" class="secondary">Print Error PDF</button>
+              </div>
+              <div id="error-search-result" class="history-cards"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Event Feed</p>
+                  <h2>What the pipeline is doing</h2>
+                </div>
+              </div>
+              <ul id="event-feed" class="event-list"></ul>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Detailed Logs</p>
+                  <h2>Error-by-error resolution trail</h2>
+                </div>
+              </div>
+              <ul id="detailed-log-list" class="event-list"></ul>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Cycle History</p>
+                  <h2>Recent batch outcomes</h2>
+                </div>
+              </div>
+              <div id="history-cards" class="history-cards"></div>
+            </section>
           </div>
         </section>
 
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Event Feed</p>
-              <h2>What the pipeline is doing</h2>
-            </div>
+        <section class="view" data-view-panel="analytics">
+          <div class="dashboard-grid analytics-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Analytics Summary</p>
+                  <h2>Agent, human, and pipeline health</h2>
+                </div>
+              </div>
+              <div id="analytics-card-grid" class="summary-grid analytics-card-grid"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Report Downloads</p>
+                  <h2>Download the full analysis report</h2>
+                </div>
+              </div>
+              <div class="toolbar">
+                <button id="download-report-json">Download JSON</button>
+                <button id="download-report-md" class="secondary">Download Markdown</button>
+              </div>
+              <div id="analytics-report-preview" class="history-cards"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Agent Routes</p>
+                  <h2>How issues were handled</h2>
+                </div>
+              </div>
+              <div id="analytics-route-chart" class="chart"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Human Funnel</p>
+                  <h2>Approval and manual resolution load</h2>
+                </div>
+              </div>
+              <div id="analytics-human-chart" class="chart"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Error Mix</p>
+                  <h2>Most common recent error types</h2>
+                </div>
+              </div>
+              <div id="analytics-error-chart" class="chart"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Pipeline Reliability</p>
+                  <h2>Uptime and crash behavior</h2>
+                </div>
+              </div>
+              <div id="analytics-health-chart" class="chart"></div>
+            </section>
           </div>
-          <ul id="event-feed" class="event-list"></ul>
         </section>
 
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Detailed Logs</p>
-              <h2>Error-by-error resolution trail</h2>
+        <section class="view" data-view-panel="clean">
+          <section class="panel full-width">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Reference Data</p>
+                <h2>Final trusted dataset</h2>
+              </div>
             </div>
-          </div>
-          <ul id="detailed-log-list" class="event-list"></ul>
+            <div class="toolbar">
+              <div class="dataset-tabs">
+                <button class="tab active" data-dataset-target="clean" data-tab="orders">Orders</button>
+                <button class="tab" data-dataset-target="clean" data-tab="payments">Payments</button>
+                <button class="tab" data-dataset-target="clean" data-tab="delivery">Delivery</button>
+              </div>
+              <input id="clean-filter" class="filter-input" placeholder="Filter by order_id or text" />
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead id="clean-table-head"></thead>
+                <tbody id="clean-table-body"></tbody>
+              </table>
+            </div>
+          </section>
         </section>
 
-        <section class="panel datasets-panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Dataset Preview</p>
-              <h2>Dirty vs healed records</h2>
+        <section class="view" data-view-panel="resolved">
+          <section class="panel full-width">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Recovered Data</p>
+                <h2>Resolved records only</h2>
+              </div>
             </div>
-          </div>
-          <div class="dataset-tabs">
-            <button class="tab active" data-tab="orders">Orders</button>
-            <button class="tab" data-tab="payments">Payments</button>
-            <button class="tab" data-tab="delivery">Delivery</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead id="table-head"></thead>
-              <tbody id="table-body"></tbody>
-            </table>
+            <div class="toolbar">
+              <input id="resolved-filter" class="filter-input" placeholder="Filter by error id, order_id, dataset, or status" />
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead id="resolved-table-head"></thead>
+                <tbody id="resolved-table-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" data-view-panel="trail">
+          <div class="dashboard-grid record-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Record Lookup</p>
+                  <h2>Trace one record end to end</h2>
+                </div>
+              </div>
+              <div class="toolbar stack">
+                <input id="record-filter" class="filter-input" placeholder="Enter order_id" />
+                <div id="record-suggestions" class="suggestions"></div>
+              </div>
+              <div id="record-summary" class="record-summary"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Change Trail</p>
+                  <h2>Record-specific error and fix details</h2>
+                </div>
+              </div>
+              <div id="record-trail-list" class="history-cards"></div>
+            </section>
           </div>
         </section>
 
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Escalation History</p>
-              <h2>Recent cycle outcomes</h2>
+        <section class="view" data-view-panel="approvals">
+          <section class="panel full-width">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Human Review</p>
+                <h2>All escalations and approvals</h2>
+              </div>
             </div>
-          </div>
-          <div id="history-cards" class="history-cards"></div>
+            <div id="approval-cards" class="history-cards"></div>
+          </section>
         </section>
       </main>
     </div>

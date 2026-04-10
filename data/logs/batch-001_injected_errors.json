@@ -1,0 +1,53 @@
+{
+  "batch_id": "batch-001",
+  "injected_errors": [
+    {
+      "error_id": "batch-001-001",
+      "cycle_id": "batch-001",
+      "type": "duplicate_record",
+      "dataset": "delivery",
+      "severity": "medium",
+      "row_index": 13,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-001-002",
+      "cycle_id": "batch-001",
+      "type": "null_key",
+      "dataset": "payments",
+      "severity": "critical",
+      "row_index": 8,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "batch-001-003",
+      "cycle_id": "batch-001",
+      "type": "orphan_record",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": 6,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "10c320f977c6a18f91b2d14be13128c6",
+      "dirty_value": "orphan-1611"
+    },
+    {
+      "error_id": "batch-001-004",
+      "cycle_id": "batch-001",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    }
+  ]
+}

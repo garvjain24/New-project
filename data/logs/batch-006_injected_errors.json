@@ -1,0 +1,53 @@
+{
+  "batch_id": "batch-006",
+  "injected_errors": [
+    {
+      "error_id": "batch-006-001",
+      "cycle_id": "batch-006",
+      "type": "null_key",
+      "dataset": "payments",
+      "severity": "critical",
+      "row_index": 12,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "5561adcb0fd46da4cad3048fa4e7fc00",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "batch-006-002",
+      "cycle_id": "batch-006",
+      "type": "duplicate_record",
+      "dataset": "delivery",
+      "severity": "medium",
+      "row_index": 4,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-006-003",
+      "cycle_id": "batch-006",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 5,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "15.56",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-006-004",
+      "cycle_id": "batch-006",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    }
+  ]
+}

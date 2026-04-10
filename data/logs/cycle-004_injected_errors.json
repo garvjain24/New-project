@@ -1,0 +1,65 @@
+{
+  "cycle_id": "cycle-004",
+  "injected_errors": [
+    {
+      "error_id": "cycle-004-001",
+      "cycle_id": "cycle-004",
+      "type": "duplicate_record",
+      "dataset": "delivery",
+      "severity": "medium",
+      "row_index": 152,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "cycle-004-002",
+      "cycle_id": "cycle-004",
+      "type": "null_key",
+      "dataset": "payments",
+      "severity": "critical",
+      "row_index": 73,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "974c1993ab8024d3ed16229183c2308d",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "cycle-004-003",
+      "cycle_id": "cycle-004",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 120,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "ee0c5c649e17808bc4a363d3a80ebf85",
+      "dirty_value": "orphan-8852"
+    },
+    {
+      "error_id": "cycle-004-004",
+      "cycle_id": "cycle-004",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 126,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "cycle-004-005",
+      "cycle_id": "cycle-004",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 176,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2018-04-04 08:39:50",
+      "dirty_value": "2026/99/99 88:61:00"
+    }
+  ]
+}

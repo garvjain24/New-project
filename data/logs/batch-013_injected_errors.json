@@ -1,0 +1,101 @@
+{
+  "batch_id": "batch-013",
+  "injected_errors": [
+    {
+      "error_id": "batch-013-001",
+      "cycle_id": "batch-013",
+      "type": "missing_column",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": null,
+      "column": "seller_id",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-013-002",
+      "cycle_id": "batch-013",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 9,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "boleto",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-013-003",
+      "cycle_id": "batch-013",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 6,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2017-05-19 18:53:40",
+      "dirty_value": "2026/99/99 88:61:00"
+    },
+    {
+      "error_id": "batch-013-004",
+      "cycle_id": "batch-013",
+      "type": "invalid_payment_value",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 2,
+      "column": "payment_value",
+      "message": "Payment value was converted from numeric to text.",
+      "original_value": "59.34",
+      "dirty_value": "NaN??"
+    },
+    {
+      "error_id": "batch-013-005",
+      "cycle_id": "batch-013",
+      "type": "null_key",
+      "dataset": "delivery",
+      "severity": "critical",
+      "row_index": 6,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "2711a938db643b3f0b62ee2c8a2784aa",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "batch-013-006",
+      "cycle_id": "batch-013",
+      "type": "duplicate_record",
+      "dataset": "delivery",
+      "severity": "medium",
+      "row_index": 7,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-013-007",
+      "cycle_id": "batch-013",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 10,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "b01875821b8dcb6abc61776f0f971bce",
+      "dirty_value": "orphan-8093"
+    },
+    {
+      "error_id": "batch-013-008",
+      "cycle_id": "batch-013",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 8,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "12.79",
+      "dirty_value": "99999.99"
+    }
+  ]
+}

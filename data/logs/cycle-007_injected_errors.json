@@ -1,0 +1,89 @@
+{
+  "cycle_id": "cycle-007",
+  "injected_errors": [
+    {
+      "error_id": "cycle-007-001",
+      "cycle_id": "cycle-007",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 190,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "b6b3633f97c686d8e188ac6fa29ff20d",
+      "dirty_value": "orphan-1350"
+    },
+    {
+      "error_id": "cycle-007-002",
+      "cycle_id": "cycle-007",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 9,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "19.77",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "cycle-007-003",
+      "cycle_id": "cycle-007",
+      "type": "null_key",
+      "dataset": "payments",
+      "severity": "critical",
+      "row_index": 68,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "b52cc4919de82b4d696a4380d10804a3",
+      "dirty_value": ""
+    },
+    {
+      "error_id": "cycle-007-004",
+      "cycle_id": "cycle-007",
+      "type": "duplicate_record",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 142,
+      "column": null,
+      "message": "A duplicate record was appended.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "cycle-007-005",
+      "cycle_id": "cycle-007",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "cycle-007-006",
+      "cycle_id": "cycle-007",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 190,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "cycle-007-007",
+      "cycle_id": "cycle-007",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 128,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2017-09-03 14:22:03",
+      "dirty_value": "2026/99/99 88:61:00"
+    }
+  ]
+}

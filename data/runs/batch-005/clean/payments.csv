@@ -1,0 +1,11 @@
+order_id,payment_type,payment_value,payment_installments
+e481f51cbdc54678b7cc49136f2d6af7,credit_card,18.12,1
+47770eb9100c2d0c44946d9cf07ec65d,credit_card,179.12,3
+83018ec114eee8641c97e08f7b4e926f,voucher,62.15,1
+a685d016c8a26f71a0bb67821070e398,boleto,99.26,1
+ec341c54a5ebf8ee0a67a8632aa7579b,credit_card,29.92,2
+62a12e4d2a742b2491d7c00d2d79bf52,credit_card,299.72,10
+34276839abbc2d596eb36540d36c624c,credit_card,217.78,5
+74ebfa44a323c96a7760bd693d690a3d,credit_card,393.46,10
+37e32b54f25d2472acbc642f7e539a36,credit_card,99.33,4
+5e99f3c445038a0709b2aea8e34ed593,credit_card,77.03,1

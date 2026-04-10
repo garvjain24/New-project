@@ -1,0 +1,65 @@
+{
+  "batch_id": "batch-007",
+  "injected_errors": [
+    {
+      "error_id": "batch-007-001",
+      "cycle_id": "batch-007",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 0,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "8.72",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-007-002",
+      "cycle_id": "batch-007",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-007-003",
+      "cycle_id": "batch-007",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 8,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2017-05-09 20:48:59",
+      "dirty_value": "2026/99/99 88:61:00"
+    },
+    {
+      "error_id": "batch-007-004",
+      "cycle_id": "batch-007",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 5,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "voucher",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-007-005",
+      "cycle_id": "batch-007",
+      "type": "null_key",
+      "dataset": "orders",
+      "severity": "critical",
+      "row_index": 1,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "5164933efe0cd14f31424b9badf81f19",
+      "dirty_value": ""
+    }
+  ]
+}

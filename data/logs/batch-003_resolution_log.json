@@ -1,0 +1,425 @@
+{
+  "batch_id": "batch-003",
+  "detailed_logs": [
+    {
+      "error_id": "batch-003-001",
+      "detected_at": "2026-04-10 18:47:13",
+      "resolved_at": "2026-04-10 18:47:13",
+      "detection_latency_sec": 8,
+      "dataset": "delivery",
+      "error_type": "freight_outlier",
+      "severity": "low",
+      "row_index": 2,
+      "column": "freight_value",
+      "finding": "Freight value exceeds acceptable range.",
+      "dirty_value": "99999.99",
+      "original_value": "11.76",
+      "order_id": "68873cf91053cd11e6b49a766db5af1a",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Replaced freight outlier with clean freight value.",
+      "resolved_value": "11.76",
+      "approval_required": false,
+      "resolution_latency_sec": 6,
+      "agent_route": "local_similarity",
+      "agent_reason": "Matched local playbook/history with enough confidence.",
+      "retrieved_context": [
+        {
+          "source": "history",
+          "error_type": "freight_outlier",
+          "dataset": "delivery",
+          "finding": "Freight value exceeds acceptable range.",
+          "strategy": "Replaced freight outlier with clean freight value.",
+          "status": "resolved",
+          "score": 0.7919
+        },
+        {
+          "source": "playbook",
+          "error_type": "freight_outlier",
+          "dataset": "",
+          "finding": "freight is unrealistic but order_id is available",
+          "strategy": "replace with trusted freight value from local store",
+          "status": "template",
+          "score": 0.3394
+        },
+        {
+          "source": "history",
+          "error_type": "invalid_payment_value",
+          "dataset": "payments",
+          "finding": "Payment value is no longer numeric.",
+          "strategy": "Normalized payment value using a repair rule and clean fallback.",
+          "status": "resolved",
+          "score": 0.1099
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-003-002",
+      "detected_at": "2026-04-10 18:47:13",
+      "resolved_at": "2026-04-10 18:47:13",
+      "detection_latency_sec": 4,
+      "dataset": "delivery",
+      "error_type": "orphan_record",
+      "severity": "high",
+      "row_index": 7,
+      "column": "order_id",
+      "finding": "`orphan-9042` does not exist in the clean orders store.",
+      "dirty_value": "orphan-9042",
+      "original_value": "5447160f15621601fa9ba2b94f4906b3",
+      "order_id": "5447160f15621601fa9ba2b94f4906b3",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Replaced orphan record with matching clean record from standard store.",
+      "resolved_value": "5447160f15621601fa9ba2b94f4906b3",
+      "approval_required": false,
+      "resolution_latency_sec": 10,
+      "agent_route": "local_fallback",
+      "agent_reason": "No LLM available or no strong local match; using conservative local rules.",
+      "retrieved_context": [
+        {
+          "source": "history",
+          "error_type": "orphan_record",
+          "dataset": "delivery",
+          "finding": "`orphan-5106` does not exist in the clean orders store.",
+          "strategy": "Replaced orphan record with matching clean record from standard store.",
+          "status": "resolved",
+          "score": 0.6628
+        },
+        {
+          "source": "history",
+          "error_type": "orphan_record",
+          "dataset": "payments",
+          "finding": "`orphan-1611` does not exist in the clean orders store.",
+          "strategy": "Replaced orphan record with matching clean record from standard store.",
+          "status": "resolved",
+          "score": 0.6171
+        },
+        {
+          "source": "history",
+          "error_type": "duplicate_record",
+          "dataset": "delivery",
+          "finding": "A duplicate record is present in the dataset.",
+          "strategy": "Removed duplicate rows and kept the first unique copy.",
+          "status": "resolved",
+          "score": 0.1774
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-003-003",
+      "detected_at": "2026-04-10 18:47:13",
+      "resolved_at": "2026-04-10 18:47:13",
+      "detection_latency_sec": 8,
+      "dataset": "payments",
+      "error_type": "unknown_payment_type",
+      "severity": "low",
+      "row_index": 9,
+      "column": "payment_type",
+      "finding": "Payment type falls outside the allowed domain.",
+      "dirty_value": "telepathy",
+      "original_value": "boleto",
+      "order_id": "9885fff91f7c807525f8320e5292a3db",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Mapped unsupported payment type back to clean domain value.",
+      "resolved_value": "boleto",
+      "approval_required": false,
+      "resolution_latency_sec": 5,
+      "agent_route": "local_similarity",
+      "agent_reason": "Matched local playbook/history with enough confidence.",
+      "retrieved_context": [
+        {
+          "source": "history",
+          "error_type": "unknown_payment_type",
+          "dataset": "payments",
+          "finding": "Payment type falls outside the allowed domain.",
+          "strategy": "Mapped unsupported payment type back to clean domain value.",
+          "status": "resolved",
+          "score": 0.7946
+        },
+        {
+          "source": "playbook",
+          "error_type": "unknown_payment_type",
+          "dataset": "",
+          "finding": "payment type is unsupported but order_id is available",
+          "strategy": "restore supported payment type from trusted local store",
+          "status": "template",
+          "score": 0.3569
+        },
+        {
+          "source": "history",
+          "error_type": "invalid_payment_value",
+          "dataset": "payments",
+          "finding": "Payment value is no longer numeric.",
+          "strategy": "Normalized payment value using a repair rule and clean fallback.",
+          "status": "resolved",
+          "score": 0.157
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-003-004",
+      "detected_at": "2026-04-10 18:47:13",
+      "resolved_at": "2026-04-10 18:47:13",
+      "detection_latency_sec": 6,
+      "dataset": "payments",
+      "error_type": "invalid_payment_value",
+      "severity": "medium",
+      "row_index": 8,
+      "column": "payment_value",
+      "finding": "Payment value is no longer numeric.",
+      "dirty_value": "forty two",
+      "original_value": "38.47",
+      "order_id": "4b87488fb6269f8321508923b95da4d6",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Normalized payment value using a repair rule and clean fallback.",
+      "resolved_value": "38.47",
+      "approval_required": false,
+      "resolution_latency_sec": 11,
+      "agent_route": "local_similarity",
+      "agent_reason": "Matched local playbook/history with enough confidence.",
+      "retrieved_context": [
+        {
+          "source": "history",
+          "error_type": "invalid_payment_value",
+          "dataset": "payments",
+          "finding": "Payment value is no longer numeric.",
+          "strategy": "Normalized payment value using a repair rule and clean fallback.",
+          "status": "resolved",
+          "score": 0.6733
+        },
+        {
+          "source": "playbook",
+          "error_type": "invalid_payment_value",
+          "dataset": "",
+          "finding": "payment_value is malformed or non-numeric",
+          "strategy": "normalize text to numeric if obvious else restore from trusted local store",
+          "status": "template",
+          "score": 0.2736
+        },
+        {
+          "source": "history",
+          "error_type": "unknown_payment_type",
+          "dataset": "payments",
+          "finding": "Payment type falls outside the allowed domain.",
+          "strategy": "Mapped unsupported payment type back to clean domain value.",
+          "status": "resolved",
+          "score": 0.2173
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-003-005",
+      "detected_at": "2026-04-10 18:47:13",
+      "resolved_at": "2026-04-10 18:47:13",
+      "detection_latency_sec": 6,
+      "dataset": "orders",
+      "error_type": "invalid_timestamp",
+      "severity": "medium",
+      "row_index": 13,
+      "column": "order_purchase_timestamp",
+      "finding": "Purchase timestamp format is invalid.",
+      "dirty_value": "2026/99/99 88:61:00",
+      "original_value": "2018-06-08 12:19:58",
+      "order_id": "4b87488fb6269f8321508923b95da4d6",
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Restored timestamp from clean order record.",
+      "resolved_value": "2018-06-08 12:19:58",
+      "approval_required": false,
+      "resolution_latency_sec": 9,
+      "agent_route": "local_similarity",
+      "agent_reason": "Matched local playbook/history with enough confidence.",
+      "retrieved_context": [
+        {
+          "source": "history",
+          "error_type": "invalid_timestamp",
+          "dataset": "orders",
+          "finding": "Purchase timestamp format is invalid.",
+          "strategy": "Restored timestamp from clean order record.",
+          "status": "resolved",
+          "score": 0.7721
+        },
+        {
+          "source": "playbook",
+          "error_type": "invalid_timestamp",
+          "dataset": "",
+          "finding": "timestamp format is invalid",
+          "strategy": "restore timestamp from trusted local store",
+          "status": "template",
+          "score": 0.6536
+        },
+        {
+          "source": "history",
+          "error_type": "orphan_record",
+          "dataset": "payments",
+          "finding": "`orphan-1611` does not exist in the clean orders store.",
+          "strategy": "Replaced orphan record with matching clean record from standard store.",
+          "status": "resolved",
+          "score": 0.0644
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    },
+    {
+      "error_id": "batch-003-006",
+      "detected_at": "2026-04-10 18:47:13",
+      "resolved_at": "2026-04-10 18:47:13",
+      "detection_latency_sec": 4,
+      "dataset": "payments",
+      "error_type": "missing_column",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "finding": "Required column `payment_value` is missing from payments.",
+      "dirty_value": null,
+      "original_value": null,
+      "order_id": null,
+      "resolver": "Local Agent",
+      "status": "resolved",
+      "resolution_action": "Recovered missing column `payment_value` from clean dataset.",
+      "resolved_value": "restored-for-14-rows",
+      "approval_required": false,
+      "resolution_latency_sec": 14,
+      "agent_route": "local_similarity",
+      "agent_reason": "Matched local playbook/history with enough confidence.",
+      "retrieved_context": [
+        {
+          "source": "history",
+          "error_type": "missing_column",
+          "dataset": "payments",
+          "finding": "Required column `payment_value` is missing from payments.",
+          "strategy": "Could not reconstruct `payment_value` for every row.",
+          "status": "escalated",
+          "score": 0.7011
+        },
+        {
+          "source": "playbook",
+          "error_type": "missing_column",
+          "dataset": "",
+          "finding": "column is recoverable from local canonical data",
+          "strategy": "reconstruct missing field from trusted local store",
+          "status": "template",
+          "score": 0.3366
+        },
+        {
+          "source": "playbook",
+          "error_type": "invalid_payment_value",
+          "dataset": "",
+          "finding": "payment_value is malformed or non-numeric",
+          "strategy": "normalize text to numeric if obvious else restore from trusted local store",
+          "status": "template",
+          "score": 0.1129
+        }
+      ],
+      "llm_suggestion": null,
+      "escalation_mode": ""
+    }
+  ],
+  "pending_approvals": [
+    {
+      "error_id": "batch-001-002",
+      "cycle_id": "batch-001",
+      "dataset": "payments",
+      "row_index": 8,
+      "column": "order_id",
+      "order_id": "e346cd9299371b18c0b28e8e29a5e376",
+      "current_value": "",
+      "proposed_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "reason": "Restore blank primary key from clean source trace.",
+      "status": "approved",
+      "proposed_field": "order_id",
+      "request_kind": "human_approval",
+      "batch_id": "batch-001",
+      "created_at": "2026-04-10 18:46:43",
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-10 18:47:04"
+        }
+      ],
+      "approved_at": "2026-04-10 18:47:04"
+    },
+    {
+      "error_id": "batch-002-003",
+      "cycle_id": "batch-002",
+      "dataset": "delivery",
+      "row_index": 10,
+      "column": "order_id",
+      "order_id": "780fe22baa36991bdbb1559f5b549596",
+      "current_value": "",
+      "proposed_value": "780fe22baa36991bdbb1559f5b549596",
+      "reason": "Restore blank primary key from clean source trace.",
+      "status": "approved",
+      "proposed_field": "order_id",
+      "request_kind": "human_approval",
+      "batch_id": "batch-002",
+      "created_at": "2026-04-10 18:46:58",
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-10 18:47:05"
+        }
+      ],
+      "approved_at": "2026-04-10 18:47:05"
+    }
+  ],
+  "all_escalations": [
+    {
+      "error_id": "batch-001-002",
+      "cycle_id": "batch-001",
+      "dataset": "payments",
+      "row_index": 8,
+      "column": "order_id",
+      "order_id": "e346cd9299371b18c0b28e8e29a5e376",
+      "current_value": "",
+      "proposed_value": "e346cd9299371b18c0b28e8e29a5e376",
+      "reason": "Restore blank primary key from clean source trace.",
+      "status": "approved",
+      "proposed_field": "order_id",
+      "request_kind": "human_approval",
+      "batch_id": "batch-001",
+      "created_at": "2026-04-10 18:46:43",
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-10 18:47:04"
+        }
+      ],
+      "approved_at": "2026-04-10 18:47:04"
+    },
+    {
+      "error_id": "batch-002-003",
+      "cycle_id": "batch-002",
+      "dataset": "delivery",
+      "row_index": 10,
+      "column": "order_id",
+      "order_id": "780fe22baa36991bdbb1559f5b549596",
+      "current_value": "",
+      "proposed_value": "780fe22baa36991bdbb1559f5b549596",
+      "reason": "Restore blank primary key from clean source trace.",
+      "status": "approved",
+      "proposed_field": "order_id",
+      "request_kind": "human_approval",
+      "batch_id": "batch-002",
+      "created_at": "2026-04-10 18:46:58",
+      "history": [
+        {
+          "action": "approved",
+          "at": "2026-04-10 18:47:05"
+        }
+      ],
+      "approved_at": "2026-04-10 18:47:05"
+    }
+  ]
+}

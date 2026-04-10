@@ -1,0 +1,65 @@
+{
+  "batch_id": "batch-010",
+  "injected_errors": [
+    {
+      "error_id": "batch-010-001",
+      "cycle_id": "batch-010",
+      "type": "orphan_record",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": 10,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "265f4e28ef8cf69f8445e2951bbe7343",
+      "dirty_value": "orphan-3625"
+    },
+    {
+      "error_id": "batch-010-002",
+      "cycle_id": "batch-010",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-010-003",
+      "cycle_id": "batch-010",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 5,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-010-004",
+      "cycle_id": "batch-010",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 12,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "10.79",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-010-005",
+      "cycle_id": "batch-010",
+      "type": "null_key",
+      "dataset": "delivery",
+      "severity": "critical",
+      "row_index": 3,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "66e4624ae69e7dc89bd50222b59f581f",
+      "dirty_value": ""
+    }
+  ]
+}

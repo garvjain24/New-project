@@ -1,0 +1,77 @@
+{
+  "batch_id": "batch-003",
+  "injected_errors": [
+    {
+      "error_id": "batch-003-001",
+      "cycle_id": "batch-003",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 2,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "11.76",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-003-002",
+      "cycle_id": "batch-003",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 7,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "5447160f15621601fa9ba2b94f4906b3",
+      "dirty_value": "orphan-9042"
+    },
+    {
+      "error_id": "batch-003-003",
+      "cycle_id": "batch-003",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 9,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "boleto",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-003-004",
+      "cycle_id": "batch-003",
+      "type": "invalid_payment_value",
+      "dataset": "payments",
+      "severity": "medium",
+      "row_index": 8,
+      "column": "payment_value",
+      "message": "Payment value was converted from numeric to text.",
+      "original_value": "38.47",
+      "dirty_value": "forty two"
+    },
+    {
+      "error_id": "batch-003-005",
+      "cycle_id": "batch-003",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 13,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2018-06-08 12:19:58",
+      "dirty_value": "2026/99/99 88:61:00"
+    },
+    {
+      "error_id": "batch-003-006",
+      "cycle_id": "batch-003",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    }
+  ]
+}
