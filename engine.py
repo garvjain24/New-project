@@ -5,12 +5,13 @@ import random
 import threading
 import time
 import types
+from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 
 from config import (
-    BASE_DIR, LOGS_DIR, RUNS_DIR, DIRTY_DIR,
+    BASE_DIR, CLEAN_DIR, LOGS_DIR, RUNS_DIR, DIRTY_DIR,
     CYCLE_SECONDS, MAX_EVENTS, MIN_BATCH_SIZE, MAX_BATCH_SIZE,
     LOCAL_PLAYBOOKS
 )
@@ -22,6 +23,7 @@ from pipeline_utils import (
 )
 from local_resolver import LocalSimilarityResolver
 from llm_client import OpenRouterClient
+from llm_simulator import LLMSimulator
 
 class SimulationEngine:
     def __init__(self):
@@ -29,6 +31,7 @@ class SimulationEngine:
         self.pending_approvals = []
         self.all_escalations = []
         self.local_resolver = LocalSimilarityResolver(LOCAL_PLAYBOOKS)
+        self.simulator = LLMSimulator()
         self.openrouter = OpenRouterClient()
         self.started_at = time.time()
         self.last_crash_at = None
@@ -45,6 +48,8 @@ class SimulationEngine:
             "human_approved_total": 0,
             "human_rejected_total": 0,
             "manual_fix_total": 0,
+            "simulator_calls_total": 0,
+            "simulator_hits_total": 0,
             "successful_batches_total": 0,
             "failed_batches_total": 0,
             "report_download_total": 0,
@@ -126,6 +131,9 @@ class SimulationEngine:
             "agent_metrics": {
                 "openrouter_enabled": self.openrouter.enabled,
                 "openrouter_model": self.openrouter.model,
+                "simulator_enabled": self.simulator.enabled,
+                "simulator_calls_total": self.telemetry["simulator_calls_total"],
+                "simulator_hits_total": self.telemetry["simulator_hits_total"],
                 "llm_calls_total": self.telemetry["llm_calls_total"],
                 "llm_success_total": self.telemetry["llm_success_total"],
                 "local_similarity_route_total": self.telemetry["local_similarity_route_total"],
@@ -258,6 +266,7 @@ Generated at: {report['generated_at']}
         error_type = issue.get("error_type")
         retrieved = self.local_resolver.retrieve(issue, self._historical_logs())
 
+        # ── Priority 1: Already-generated local healer ──────────────────
         func_name = f"heal_{error_type}"
         if hasattr(self.healers_module, func_name):
             return {
@@ -268,6 +277,24 @@ Generated at: {report['generated_at']}
                 "healer_func": getattr(self.healers_module, func_name)
             }
 
+        # ── Priority 2: LLM Simulator (zero-cost, rule-based) ───────────
+        self.telemetry["simulator_calls_total"] += 1
+        self.telemetry["llm_calls_total"] += 1
+        sim_suggestion = self.simulator.suggest(issue, retrieved)
+        if sim_suggestion is not None:
+            self.telemetry["simulator_hits_total"] += 1
+            self.telemetry["llm_success_total"] += 1
+            route = sim_suggestion.get("route", "generate_local")
+            if route == "generate_local":
+                self.telemetry["llm_guided_route_total"] += 1
+            return {
+                "route": route,
+                "reason": sim_suggestion.get("reason", "Simulator-guided decision."),
+                "retrieved_context": retrieved,
+                "llm_suggestion": sim_suggestion,
+            }
+
+        # ── Priority 3: Real LLM call (paid API) ────────────────────────
         if self.openrouter.enabled:
             self.telemetry["llm_calls_total"] += 1
             suggestion = self.openrouter.suggest(issue, retrieved)
@@ -282,6 +309,7 @@ Generated at: {report['generated_at']}
                     "retrieved_context": retrieved,
                     "llm_suggestion": suggestion,
                 }
+
         self.telemetry["local_fallback_route_total"] += 1
         return {
             "route": "local_fallback",
@@ -481,8 +509,12 @@ Generated at: {report['generated_at']}
                     log["resolution_latency_sec"] = self._simulated_resolution_latency(error_type)
                     
                     log["resolver"] = "Local Agent (Generated Healer)"
+                    suggestion_source = (agent_plan.get("llm_suggestion") or {}).get("_source", "")
                     if agent_plan["llm_suggestion"] and agent_plan["route"] in ["llm_guided_local", "generate_local"]:
-                        log["resolver"] = "OpenRouter LLM + Local Context"
+                        if suggestion_source == "llm_simulator":
+                            log["resolver"] = "LLM Simulator + Local Context"
+                        else:
+                            log["resolver"] = "OpenRouter LLM + Local Context"
                         self.telemetry["llm_assisted_resolved_total"] += 1
                     else:
                         self.telemetry["local_rule_resolved_total"] += 1

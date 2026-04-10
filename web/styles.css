@@ -323,6 +323,7 @@ button.ghost {
   display: block;
   margin-top: 8px;
   font-size: 1.4rem;
+  word-break: break-all;
 }
 
 .ratio-grid {
