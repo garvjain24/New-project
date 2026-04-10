@@ -7,7 +7,7 @@
       "type": "freight_outlier",
       "dataset": "delivery",
       "severity": "low",
-      "row_index": 6,
+      "row_index": 10,
       "column": "freight_value",
       "message": "Freight value was changed to an unrealistic outlier.",
       "original_value": "57.79",
@@ -16,38 +16,38 @@
     {
       "error_id": "batch-005-002",
       "cycle_id": "batch-005",
-      "type": "invalid_payment_value",
-      "dataset": "payments",
-      "severity": "medium",
-      "row_index": 7,
-      "column": "payment_value",
-      "message": "Payment value was converted from numeric to text.",
-      "original_value": "393.46",
-      "dirty_value": "ten thousand"
-    },
-    {
-      "error_id": "batch-005-003",
-      "cycle_id": "batch-005",
-      "type": "orphan_record",
-      "dataset": "payments",
-      "severity": "high",
-      "row_index": 6,
-      "column": "order_id",
-      "message": "Foreign key no longer matches a clean order.",
-      "original_value": "34276839abbc2d596eb36540d36c624c",
-      "dirty_value": "orphan-5341"
-    },
-    {
-      "error_id": "batch-005-004",
-      "cycle_id": "batch-005",
       "type": "unknown_payment_type",
       "dataset": "payments",
       "severity": "low",
-      "row_index": 5,
+      "row_index": 14,
       "column": "payment_type",
       "message": "Payment type was changed to an unsupported value.",
       "original_value": "credit_card",
       "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-005-003",
+      "cycle_id": "batch-005",
+      "type": "missing_column",
+      "dataset": "payments",
+      "severity": "high",
+      "row_index": null,
+      "column": "payment_value",
+      "message": "A required column was removed from the dataset.",
+      "original_value": null,
+      "dirty_value": null
+    },
+    {
+      "error_id": "batch-005-004",
+      "cycle_id": "batch-005",
+      "type": "null_key",
+      "dataset": "delivery",
+      "severity": "critical",
+      "row_index": 9,
+      "column": "order_id",
+      "message": "Primary key order_id was blanked out.",
+      "original_value": "90349f264a3d6a2525a34598d09dda6b",
+      "dirty_value": ""
     }
   ]
 }

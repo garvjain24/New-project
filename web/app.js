@@ -6,6 +6,10 @@ const state = {
   },
   recordOrderId: "",
   errorSearch: "",
+  selectedBatchId: "",
+  selectedBatchErrors: [],
+  batchErrorsLoading: false,
+  batchErrorsError: "",
   payload: null,
 };
 
@@ -14,6 +18,19 @@ async function fetchState() {
   state.payload = await response.json();
   if (!state.recordOrderId) {
     state.recordOrderId = findFirstTrackedOrderId() || "";
+  }
+  const history = getAllBatchHistory();
+  const hasSelectedBatch = history.some(
+    (batch) => (batch.batch_id || batch.cycle_id) === state.selectedBatchId
+  );
+  if (!hasSelectedBatch) {
+    state.selectedBatchId = history[0]?.batch_id || history[0]?.cycle_id || "";
+  }
+  if (state.selectedBatchId) {
+    await fetchBatchErrors(state.selectedBatchId, false);
+  } else {
+    state.selectedBatchErrors = [];
+    state.batchErrorsError = "";
   }
   render();
 }
@@ -25,6 +42,41 @@ async function postAction(payload) {
     body: JSON.stringify(payload),
   });
   await fetchState();
+}
+
+async function fetchBatchErrors(batchId, shouldRender = true) {
+  if (!batchId) {
+    state.selectedBatchErrors = [];
+    state.batchErrorsError = "";
+    if (shouldRender) render();
+    return;
+  }
+
+  state.batchErrorsLoading = true;
+  state.batchErrorsError = "";
+  if (shouldRender) render();
+
+  try {
+    const response = await fetch(`/api/batch/${encodeURIComponent(batchId)}/errors`);
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error || "Unable to load batch errors.");
+    }
+    if (state.selectedBatchId === batchId) {
+      state.selectedBatchErrors = payload.detailed_logs || [];
+      state.batchErrorsError = "";
+    }
+  } catch (error) {
+    if (state.selectedBatchId === batchId) {
+      state.selectedBatchErrors = [];
+      state.batchErrorsError = error.message;
+    }
+  } finally {
+    if (state.selectedBatchId === batchId) {
+      state.batchErrorsLoading = false;
+    }
+    if (shouldRender) render();
+  }
 }
 
 function setText(id, value) {
@@ -78,6 +130,13 @@ function getAllLogs() {
 
 function getAllBatchHistory() {
   return state.payload?.history || [];
+}
+
+function getBatchErrorRowTone(status) {
+  if (status === "resolved") return "rgba(117, 245, 200, 0.12)";
+  if (status === "approved" || status === "manually_fixed") return "rgba(255, 209, 102, 0.16)";
+  if (status === "escalated") return "rgba(255, 122, 144, 0.14)";
+  return "rgba(255, 255, 255, 0.025)";
 }
 
 function mean(values) {
@@ -149,6 +208,74 @@ function renderList(id, items, formatter) {
   });
 }
 
+function getEventFeedTone(item) {
+  const stage = String(item?.stage ?? "").toLowerCase();
+  const message = String(item?.message ?? "").toLowerCase();
+
+  if (stage.includes("approval") || stage.includes("review") || message.includes("human approval") || message.includes("manual fix")) {
+    return "warning";
+  }
+  if (stage.includes("escalation") || message.includes("escalat") || message.includes("rejected")) {
+    return "danger";
+  }
+  if (stage.includes("healing") || message.includes("resolved") || message.includes("restored")) {
+    return "success";
+  }
+  return "neutral";
+}
+
+function renderDetailedLogGroups() {
+  const host = document.getElementById("detailed-log-list");
+  host.innerHTML = "";
+
+  const history = getAllBatchHistory();
+  if (!history.length) {
+    host.innerHTML = "<li>No items yet.</li>";
+    return;
+  }
+
+  history.forEach((batch) => {
+    const batchId = batch.batch_id || batch.cycle_id || "-";
+    const logs = batch.detailed_logs || [];
+    const item = document.createElement("li");
+    item.className = "batch-log-group";
+    item.innerHTML = `
+      <div class="batch-log-header">
+        <div>
+          <strong>${escapeHtml(batchId)}</strong>
+          <div class="batch-log-subtitle">${escapeHtml(formatStatus(batch))}</div>
+        </div>
+        <div class="batch-log-count">${escapeHtml(logs.length)} errors</div>
+      </div>
+      <div class="batch-log-entries">
+        ${
+          logs.length
+            ? logs
+                .map(
+                  (log) => `
+                    <article class="batch-log-entry">
+                      <div class="event-meta"><span>${escapeHtml(log.error_id)}</span><span>${escapeHtml(log.resolver)}</span></div>
+                      <div><strong>${escapeHtml(log.dataset)}</strong> / ${escapeHtml(log.error_type)}</div>
+                      <div>${escapeHtml(log.finding)}</div>
+                      <div>Dirty: ${escapeHtml(log.dirty_value ?? "-")}</div>
+                      <div>Original: ${escapeHtml(log.original_value ?? "-")}</div>
+                      <div>Action: ${escapeHtml(log.resolution_action)}</div>
+                      <div>Resolved: ${escapeHtml(log.resolved_value ?? "-")}</div>
+                      <div>Agent Route: ${escapeHtml(log.agent_route ?? "-")}</div>
+                      <div>MTTD: ${escapeHtml(log.detection_latency_sec)}s | MTTR: ${escapeHtml(log.resolution_latency_sec)}s</div>
+                      <div>Status: ${escapeHtml(log.status)}</div>
+                    </article>
+                  `
+                )
+                .join("")
+            : "<div class='batch-log-empty'>No detailed logs in this batch.</div>"
+        }
+      </div>
+    `;
+    host.appendChild(item);
+  });
+}
+
 function renderDatasetTable(stage, target) {
   const datasetName = state.datasetTabs[target];
   const filterValue = getFilterValue(`${target}-filter`);
@@ -181,6 +308,123 @@ function renderDatasetTable(stage, target) {
   });
 }
 
+function stringifyComparisonValue(value) {
+  if (value === null || value === undefined || value === "") return "";
+  return String(value);
+}
+
+function getComparisonRows() {
+  const cycle = state.payload?.current_cycle;
+  if (!cycle) return [];
+
+  const datasetName = state.datasetTabs.clean;
+  const cleanRows = cycle.datasets.clean?.[datasetName] || [];
+  const dirtyRows = cycle.datasets.dirty?.[datasetName] || [];
+  const healedRows = cycle.datasets.healed?.[datasetName] || [];
+  const rowCount = Math.max(cleanRows.length, dirtyRows.length, healedRows.length);
+  const output = [];
+
+  for (let index = 0; index < rowCount; index += 1) {
+    const cleanRow = cleanRows[index] || {};
+    const dirtyRow = dirtyRows[index] || {};
+    const healedRow = healedRows[index] || {};
+    const columns = Array.from(
+      new Set([...Object.keys(cleanRow), ...Object.keys(dirtyRow), ...Object.keys(healedRow)])
+    );
+    const recordId =
+      cleanRow.order_id || dirtyRow.order_id || healedRow.order_id || `${datasetName}-row-${index + 1}`;
+
+    columns.forEach((field) => {
+      const cleanValue = stringifyComparisonValue(cleanRow[field]);
+      const dirtyValue = stringifyComparisonValue(dirtyRow[field]);
+      const healedValue = stringifyComparisonValue(healedRow[field]);
+      const dirtyChanged = dirtyValue !== cleanValue;
+      const healedChanged = healedValue !== cleanValue || healedValue !== dirtyValue;
+
+      if (!dirtyChanged && !healedChanged) return;
+
+      output.push({
+        record_id: recordId,
+        field,
+        clean_value: cleanValue || "-",
+        dirty_value: dirtyValue || "-",
+        healed_value: healedValue || "-",
+        dirty_changed: dirtyChanged,
+        healed_changed: healedChanged,
+      });
+    });
+  }
+
+  return filterRows(output, getFilterValue("clean-filter"));
+}
+
+function renderComparisonTable() {
+  const head = document.getElementById("comparison-table-head");
+  const body = document.getElementById("comparison-table-body");
+  head.innerHTML = "";
+  body.innerHTML = "";
+
+  const rows = getComparisonRows();
+  if (!rows.length) {
+    body.innerHTML = "<tr><td>No side-by-side differences in the current dataset.</td></tr>";
+    return;
+  }
+
+  const columns = [
+    "record_id",
+    "field",
+    "clean_value",
+    "dirty_value",
+    "healed_value",
+  ];
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("");
+  head.appendChild(tr);
+
+  rows.forEach((row) => {
+    const item = document.createElement("tr");
+    item.innerHTML = `
+      <td>${escapeHtml(row.record_id)}</td>
+      <td>${escapeHtml(row.field)}</td>
+      <td>${escapeHtml(row.clean_value)}</td>
+      <td class="${row.dirty_changed ? "compare-changed compare-dirty" : ""}">${escapeHtml(row.dirty_value)}</td>
+      <td class="${row.healed_changed ? "compare-changed compare-healed" : ""}">${escapeHtml(row.healed_value)}</td>
+    `;
+    body.appendChild(item);
+  });
+}
+
+function downloadComparisonCsv() {
+  const rows = getComparisonRows();
+  if (!rows.length) return;
+
+  const columns = [
+    "record_id",
+    "field",
+    "clean_value",
+    "dirty_value",
+    "healed_value",
+    "dirty_changed",
+    "healed_changed",
+  ];
+  const escapeCsv = (value) => `"${String(value ?? "").replaceAll("\"", "\"\"")}"`;
+  const lines = [
+    columns.join(","),
+    ...rows.map((row) => columns.map((column) => escapeCsv(row[column])).join(",")),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const datasetName = state.datasetTabs.clean;
+  link.href = url;
+  link.download = `${datasetName}-comparison.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function getResolvedIssueRows() {
   const cycle = state.payload?.current_cycle;
   if (!cycle) return [];
@@ -197,6 +441,7 @@ function getResolvedIssueRows() {
       status: item.status,
       resolver: item.resolver,
       action: item.resolution_action,
+      rollback_action: item.error_id,
     }));
 }
 
@@ -223,6 +468,7 @@ function renderResolvedIssuesTable() {
     "status",
     "resolver",
     "action",
+    "rollback_action",
   ];
 
   const tr = document.createElement("tr");
@@ -231,8 +477,21 @@ function renderResolvedIssuesTable() {
 
   rows.forEach((row) => {
     const item = document.createElement("tr");
-    item.innerHTML = columns.map((column) => `<td>${escapeHtml(row[column] ?? "")}</td>`).join("");
+    item.innerHTML = columns
+      .map((column) =>
+        column === "rollback_action"
+          ? `<td><button class="ghost rollback-error-btn" data-error-id="${escapeHtml(row.error_id)}">Undo</button></td>`
+          : `<td>${escapeHtml(row[column] ?? "")}</td>`
+      )
+      .join("");
     body.appendChild(item);
+  });
+
+  document.querySelectorAll(".rollback-error-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!window.confirm("Undo this resolved issue and reopen it for another healing attempt?")) return;
+      postAction({ action: "rollback-error", error_id: button.dataset.errorId });
+    });
   });
 }
 
@@ -402,6 +661,78 @@ function renderHistory(history) {
       <div>Detected: ${cycle.summary.detected} | Resolved: ${cycle.summary.resolved} | Escalated: ${cycle.summary.escalated}</div>
     `;
     existing.appendChild(card);
+  });
+}
+
+function renderBatchHistoryPanel() {
+  const listHost = document.getElementById("batch-history-list");
+  const title = document.getElementById("batch-error-title");
+  const head = document.getElementById("batch-errors-table-head");
+  const body = document.getElementById("batch-errors-table-body");
+  const history = getAllBatchHistory();
+
+  listHost.innerHTML = "";
+  head.innerHTML = "";
+  body.innerHTML = "";
+  title.textContent = state.selectedBatchId ? `Batch Errors: ${state.selectedBatchId}` : "Batch Errors";
+
+  if (!history.length) {
+    listHost.innerHTML = "<div class='history-card'>No completed batches yet.</div>";
+    body.innerHTML = "<tr><td>No batch selected.</td></tr>";
+    return;
+  }
+
+  history.forEach((batch) => {
+    const batchId = batch.batch_id || batch.cycle_id;
+    const button = document.createElement("button");
+    button.className = state.selectedBatchId === batchId ? "tab active" : "tab";
+    button.textContent = batchId;
+    button.style.width = "100%";
+    button.style.textAlign = "left";
+    button.addEventListener("click", async () => {
+      if (state.selectedBatchId === batchId) return;
+      state.selectedBatchId = batchId;
+      state.selectedBatchErrors = [];
+      await fetchBatchErrors(batchId);
+    });
+    listHost.appendChild(button);
+  });
+
+  const columns = [
+    "error_id",
+    "error_type",
+    "dataset",
+    "severity",
+    "status",
+    "resolution_action",
+    "resolver",
+  ];
+  const tr = document.createElement("tr");
+  tr.innerHTML = columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("");
+  head.appendChild(tr);
+
+  if (state.batchErrorsLoading) {
+    body.innerHTML = "<tr><td>Loading batch errors...</td></tr>";
+    return;
+  }
+
+  if (state.batchErrorsError) {
+    body.innerHTML = `<tr><td>${escapeHtml(state.batchErrorsError)}</td></tr>`;
+    return;
+  }
+
+  if (!state.selectedBatchErrors.length) {
+    body.innerHTML = "<tr><td>No detailed errors found for this batch.</td></tr>";
+    return;
+  }
+
+  state.selectedBatchErrors.forEach((row) => {
+    const item = document.createElement("tr");
+    item.style.background = getBatchErrorRowTone(row.status);
+    item.innerHTML = columns
+      .map((column) => `<td>${escapeHtml(row[column] ?? "-")}</td>`)
+      .join("");
+    body.appendChild(item);
   });
 }
 
@@ -617,21 +948,12 @@ function renderOverview() {
     <div>${escapeHtml(item.resolution_action)}</div>
   `);
   renderList("event-feed", payload.event_feed, (item) => `
-    <div class="event-meta"><span>${escapeHtml(item.stage)}</span><span>${escapeHtml(item.time)}</span></div>
-    <div>${escapeHtml(item.message)}</div>
+    <div class="event-feed-item event-feed-item--${escapeHtml(getEventFeedTone(item))}">
+      <div class="event-meta"><span>${escapeHtml(item.stage)}</span><span>${escapeHtml(item.time)}</span></div>
+      <div>${escapeHtml(item.message)}</div>
+    </div>
   `);
-  renderList("detailed-log-list", cycle?.detailed_logs, (item) => `
-    <div class="event-meta"><span>${escapeHtml(item.error_id)}</span><span>${escapeHtml(item.resolver)}</span></div>
-    <div><strong>${escapeHtml(item.dataset)}</strong> / ${escapeHtml(item.error_type)}</div>
-    <div>${escapeHtml(item.finding)}</div>
-    <div>Dirty: ${escapeHtml(item.dirty_value ?? "-")}</div>
-    <div>Original: ${escapeHtml(item.original_value ?? "-")}</div>
-    <div>Action: ${escapeHtml(item.resolution_action)}</div>
-    <div>Resolved: ${escapeHtml(item.resolved_value ?? "-")}</div>
-    <div>Agent Route: ${escapeHtml(item.agent_route ?? "-")}</div>
-    <div>MTTD: ${escapeHtml(item.detection_latency_sec)}s | MTTR: ${escapeHtml(item.resolution_latency_sec)}s</div>
-    <div>Status: ${escapeHtml(item.status)}</div>
-  `);
+  renderDetailedLogGroups();
   renderHistory(payload.history);
 }
 
@@ -670,6 +992,7 @@ function render() {
   renderOverview();
   renderAnalyticsPage();
   renderDatasetTable("healed", "clean");
+  renderComparisonTable();
   renderResolvedIssuesTable();
   renderRecordTrail();
   renderApprovals();
@@ -706,6 +1029,9 @@ document.querySelectorAll("[data-dataset-target]").forEach((button) => {
       .forEach((tab) => tab.classList.remove("active"));
     button.classList.add("active");
     renderDatasetTable("healed", target);
+    if (target === "clean") {
+      renderComparisonTable();
+    }
   });
 });
 
@@ -718,6 +1044,7 @@ document.querySelectorAll(".chart-toggle").forEach((button) => {
 
 document.getElementById("clean-filter").addEventListener("input", () => {
   renderDatasetTable("healed", "clean");
+  renderComparisonTable();
 });
 
 document.getElementById("resolved-filter").addEventListener("input", () => {
@@ -744,6 +1071,35 @@ document.getElementById("download-report-json").addEventListener("click", () => 
 
 document.getElementById("download-report-md").addEventListener("click", () => {
   window.location.href = "/api/analysis-report.md";
+});
+
+document.getElementById("download-comparison-btn").addEventListener("click", () => {
+  downloadComparisonCsv();
+});
+
+document.getElementById("download-healed-orders").addEventListener("click", () => {
+  window.location.href = "/api/healed-data/orders.csv";
+});
+
+document.getElementById("download-healed-payments").addEventListener("click", () => {
+  window.location.href = "/api/healed-data/payments.csv";
+});
+
+document.getElementById("download-healed-delivery").addEventListener("click", () => {
+  window.location.href = "/api/healed-data/delivery.csv";
+});
+
+document.getElementById("rollback-batch-btn").addEventListener("click", () => {
+  const batchId = state.payload?.current_cycle?.batch_id || state.payload?.current_cycle?.cycle_id;
+  if (!batchId) return;
+  if (!window.confirm("Rollback this batch to its saved dirty state? This will reopen resolved issues in the current batch.")) return;
+  postAction({ action: "rollback-batch", batch_id: batchId });
+});
+
+document.getElementById("reapply-batch-healing-btn").addEventListener("click", () => {
+  const batchId = state.payload?.current_cycle?.batch_id || state.payload?.current_cycle?.cycle_id;
+  if (!batchId) return;
+  postAction({ action: "reapply-batch-healing", batch_id: batchId });
 });
 
 fetchState();

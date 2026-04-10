@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-04-10 18:47:58",
+  "generated_at": "2026-04-10 21:34:04",
   "system": {
-    "server_started_at": "2026-04-10 18:46:41",
-    "uptime_seconds": 77.44,
-    "crash_free_uptime_seconds": 77.44,
+    "server_started_at": "2026-04-10 21:29:20",
+    "uptime_seconds": 283.88,
+    "crash_free_uptime_seconds": 283.88,
     "crash_count": 0,
     "successful_batches_total": 6,
     "failed_batches_total": 0,
@@ -14,130 +14,130 @@
     "openrouter_model": "openai/gpt-4o-mini",
     "llm_calls_total": 0,
     "llm_success_total": 0,
-    "local_similarity_route_total": 21,
-    "local_fallback_route_total": 10,
+    "local_similarity_route_total": 28,
+    "local_fallback_route_total": 9,
     "llm_guided_route_total": 0,
-    "local_rule_resolved_total": 25,
+    "local_rule_resolved_total": 29,
     "llm_assisted_resolved_total": 0
   },
   "human_metrics": {
-    "human_approval_requests_total": 4,
-    "human_resolution_requests_total": 2,
-    "human_approved_total": 2,
+    "human_approval_requests_total": 5,
+    "human_resolution_requests_total": 3,
+    "human_approved_total": 3,
     "human_rejected_total": 0,
     "manual_fix_total": 0,
     "open_human_queue_total": 2
   },
   "performance_metrics": {
-    "mttd_seconds": 5.55,
-    "mttr_seconds": 41.48,
-    "issues_detected_total": 31,
-    "issues_resolved_total": 27,
-    "issues_escalated_total": 4
+    "mttd_seconds": 5.46,
+    "mttr_seconds": 45.54,
+    "issues_detected_total": 37,
+    "issues_resolved_total": 32,
+    "issues_escalated_total": 5
   },
   "recent_breakdowns": {
     "routes": {
-      "local_fallback": 10,
-      "local_similarity": 21
+      "local_similarity": 28,
+      "local_fallback": 9
     },
     "error_types": {
-      "null_key": 4,
-      "duplicate_record": 3,
-      "freight_outlier": 5,
-      "missing_column": 3,
       "invalid_payment_value": 4,
-      "orphan_record": 5,
-      "unknown_payment_type": 4,
-      "invalid_timestamp": 3
+      "missing_column": 6,
+      "unknown_payment_type": 5,
+      "invalid_timestamp": 4,
+      "duplicate_record": 4,
+      "freight_outlier": 5,
+      "null_key": 5,
+      "orphan_record": 4
     },
     "statuses": {
-      "escalated": 4,
-      "resolved": 25,
-      "approved": 2
+      "resolved": 29,
+      "escalated": 5,
+      "approved": 3
     },
     "datasets": {
-      "payments": 16,
-      "delivery": 12,
-      "orders": 3
+      "payments": 18,
+      "delivery": 14,
+      "orders": 5
     }
   },
   "recent_batches": [
     {
       "batch_id": "batch-006",
-      "started_at": "2026-04-10 18:47:58",
-      "batch_size": 13,
-      "status": "attention",
-      "detected": 4,
-      "resolved": 2,
-      "escalated": 2
-    },
-    {
-      "batch_id": "batch-005",
-      "started_at": "2026-04-10 18:47:43",
-      "batch_size": 10,
+      "started_at": "2026-04-10 21:30:37",
+      "batch_size": 15,
       "status": "degraded",
-      "detected": 4,
-      "resolved": 4,
+      "detected": 5,
+      "resolved": 5,
       "escalated": 0
     },
     {
+      "batch_id": "batch-005",
+      "started_at": "2026-04-10 21:30:22",
+      "batch_size": 15,
+      "status": "attention",
+      "detected": 4,
+      "resolved": 3,
+      "escalated": 1
+    },
+    {
       "batch_id": "batch-004",
-      "started_at": "2026-04-10 18:47:28",
+      "started_at": "2026-04-10 21:30:07",
       "batch_size": 13,
       "status": "attention",
-      "detected": 7,
-      "resolved": 6,
+      "detected": 8,
+      "resolved": 7,
       "escalated": 1
     },
     {
       "batch_id": "batch-003",
-      "started_at": "2026-04-10 18:47:13",
-      "batch_size": 14,
-      "status": "degraded",
-      "detected": 6,
-      "resolved": 6,
-      "escalated": 0
+      "started_at": "2026-04-10 21:29:52",
+      "batch_size": 12,
+      "status": "attention",
+      "detected": 8,
+      "resolved": 7,
+      "escalated": 1
     },
     {
       "batch_id": "batch-002",
-      "started_at": "2026-04-10 18:46:58",
-      "batch_size": 11,
-      "status": "healthy",
-      "detected": 6,
-      "resolved": 6,
-      "escalated": 0
+      "started_at": "2026-04-10 21:29:37",
+      "batch_size": 13,
+      "status": "attention",
+      "detected": 5,
+      "resolved": 4,
+      "escalated": 1
     },
     {
       "batch_id": "batch-001",
-      "started_at": "2026-04-10 18:46:43",
-      "batch_size": 14,
+      "started_at": "2026-04-10 21:29:22",
+      "batch_size": 12,
       "status": "attention",
-      "detected": 4,
-      "resolved": 3,
+      "detected": 7,
+      "resolved": 6,
       "escalated": 1
     }
   ],
   "open_escalations": [
     {
-      "error_id": "batch-004-001",
+      "error_id": "batch-004-002",
       "batch_id": "batch-004",
-      "dataset": "payments",
+      "dataset": "delivery",
       "status": "pending",
       "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "7206b86ea789983f7a273ea7fa0bc2a8"
+      "proposed_value": "974c1993ab8024d3ed16229183c2308d"
     },
     {
-      "error_id": "batch-006-001",
-      "batch_id": "batch-006",
-      "dataset": "payments",
+      "error_id": "batch-005-004",
+      "batch_id": "batch-005",
+      "dataset": "delivery",
       "status": "pending",
       "reason": "Restore blank primary key from clean source trace.",
-      "proposed_value": "5561adcb0fd46da4cad3048fa4e7fc00"
+      "proposed_value": "90349f264a3d6a2525a34598d09dda6b"
     }
   ],
   "downloads": {
-    "report_download_total": 2,
-    "json_path": "/Users/garv/Documents/New project/data/logs/latest_analysis_report.json",
-    "markdown_path": "/Users/garv/Documents/New project/data/logs/latest_analysis_report.md"
+    "report_download_total": 0,
+    "json_path": "/Users/aryaapatil/Desktop/MPR2/New-project/data/logs/latest_analysis_report.json",
+    "markdown_path": "/Users/aryaapatil/Desktop/MPR2/New-project/data/logs/latest_analysis_report.md"
   }
 }

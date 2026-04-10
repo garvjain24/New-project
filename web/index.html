@@ -179,6 +179,7 @@
               </div>
               <div id="history-cards" class="history-cards"></div>
             </section>
+
           </div>
         </section>
 
@@ -260,6 +261,13 @@
             </div>
             <div class="toolbar">
               <div class="dataset-tabs">
+                <button id="download-healed-orders" class="secondary">Download Orders CSV</button>
+                <button id="download-healed-payments" class="secondary">Download Payments CSV</button>
+                <button id="download-healed-delivery" class="secondary">Download Delivery CSV</button>
+              </div>
+            </div>
+            <div class="toolbar">
+              <div class="dataset-tabs">
                 <button class="tab active" data-dataset-target="clean" data-tab="orders">Orders</button>
                 <button class="tab" data-dataset-target="clean" data-tab="payments">Payments</button>
                 <button class="tab" data-dataset-target="clean" data-tab="delivery">Delivery</button>
@@ -273,6 +281,22 @@
               </table>
             </div>
           </section>
+
+          <section class="panel full-width">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Comparison View</p>
+                <h2>Dirty vs clean vs healed side by side</h2>
+              </div>
+              <button id="download-comparison-btn" class="secondary">Download Comparison CSV</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead id="comparison-table-head"></thead>
+                <tbody id="comparison-table-body"></tbody>
+              </table>
+            </div>
+          </section>
         </section>
 
         <section class="view" data-view-panel="resolved">
@@ -281,6 +305,10 @@
               <div>
                 <p class="eyebrow">Recovered Data</p>
                 <h2>Resolved records only</h2>
+              </div>
+              <div class="dataset-tabs">
+                <button id="rollback-batch-btn" class="secondary">Rollback Current Batch</button>
+                <button id="reapply-batch-healing-btn" class="ghost">Reapply Healing</button>
               </div>
             </div>
             <div class="toolbar">

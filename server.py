@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 import math
 import os
@@ -913,7 +915,7 @@ Generated at: {report['generated_at']}
             self.state["last_run_at"] = now
             self.state["next_run_at"] = now + CYCLE_SECONDS
             self.state["current_cycle"] = current_cycle
-            self.state["history"] = ([current_cycle] + self.state["history"])[:12]
+            self.state["history"] = [current_cycle] + self.state["history"]
             self.state["event_feed"] = (feed + self.state["event_feed"])[:MAX_EVENTS]
             self.state["metrics"]["total_batches"] += 1
             self.state["metrics"]["detected_issues"] += len(detected)
@@ -964,6 +966,225 @@ Generated at: {report['generated_at']}
             batch["summary"]["escalated"] for batch in self.state["history"]
         )
 
+    def _prepend_event(self, stage, message, event_time=None):
+        self.state["event_feed"] = [
+            {
+                "time": event_time or self._now_text(),
+                "stage": stage,
+                "message": message,
+            }
+        ] + self.state["event_feed"]
+        self.state["event_feed"] = self.state["event_feed"][:MAX_EVENTS]
+
+    def _active_resolution_statuses(self):
+        return {"resolved", "approved", "manually_fixed"}
+
+    def _find_batch_containing_log(self, error_id):
+        current = self.state.get("current_cycle")
+        if current and any(log.get("error_id") == error_id for log in current.get("detailed_logs", [])):
+            return current
+        for batch in self.state.get("history", []):
+            if any(log.get("error_id") == error_id for log in batch.get("detailed_logs", [])):
+                return batch
+        return None
+
+    def _clean_lookup(self, clean):
+        return {
+            name: {row["order_id"]: row for row in rows if row.get("order_id")}
+            for name, rows in clean.items()
+        }
+
+    def _apply_resolution_log(self, healed, clean_lookup, log):
+        dataset = log.get("dataset")
+        error_type = log.get("error_type")
+        row_index = log.get("row_index")
+        column = log.get("column")
+        resolved_value = log.get("resolved_value")
+        if dataset not in healed:
+            return
+
+        if error_type == "missing_column":
+            for row in healed[dataset]:
+                order_id = row.get("order_id")
+                if order_id and order_id in clean_lookup[dataset]:
+                    row[column] = clean_lookup[dataset][order_id].get(column, "")
+            return
+
+        if error_type == "duplicate_record":
+            unique = []
+            seen = set()
+            for row in healed[dataset]:
+                row_key = json.dumps(row, sort_keys=True)
+                if row_key not in seen:
+                    unique.append(row)
+                    seen.add(row_key)
+            healed[dataset] = unique
+            return
+
+        if row_index is None or row_index >= len(healed[dataset]):
+            return
+
+        if error_type == "invalid_payment_value":
+            healed[dataset][row_index]["payment_value"] = resolved_value
+            return
+
+        if error_type == "orphan_record":
+            order_id = resolved_value or log.get("original_value")
+            if order_id in clean_lookup[dataset]:
+                healed[dataset][row_index] = deepcopy(clean_lookup[dataset][order_id])
+            return
+
+        if error_type == "invalid_timestamp":
+            healed[dataset][row_index][column or "order_purchase_timestamp"] = resolved_value
+            return
+
+        if error_type == "freight_outlier":
+            healed[dataset][row_index][column or "freight_value"] = resolved_value
+            return
+
+        if error_type == "unknown_payment_type":
+            healed[dataset][row_index][column or "payment_type"] = resolved_value
+            return
+
+        if error_type == "null_key":
+            healed[dataset][row_index]["order_id"] = resolved_value
+            return
+
+        if column == "row":
+            order_id = resolved_value or log.get("original_value")
+            if order_id in clean_lookup[dataset]:
+                healed[dataset][row_index] = deepcopy(clean_lookup[dataset][order_id])
+            else:
+                healed[dataset][row_index]["order_id"] = order_id
+            return
+
+        if column:
+            healed[dataset][row_index][column] = resolved_value
+
+    def _rebuild_healed_for_batch(self, batch):
+        healed = deepcopy(batch["datasets"]["dirty"])
+        clean_lookup = self._clean_lookup(batch["datasets"]["clean"])
+        for log in batch.get("detailed_logs", []):
+            if log.get("status") in self._active_resolution_statuses():
+                self._apply_resolution_log(healed, clean_lookup, log)
+        batch["datasets"]["healed"] = healed
+
+    def _refresh_batch_summary(self, batch):
+        resolved = sum(
+            1 for item in batch["detailed_logs"] if item.get("status") in self._active_resolution_statuses()
+        )
+        escalated = sum(1 for item in batch["detailed_logs"] if item.get("status") == "escalated")
+        batch["summary"]["resolved"] = resolved
+        batch["summary"]["escalated"] = escalated
+        detected = len(batch.get("detected_issues", []))
+        if detected == 0:
+            batch["status"] = "healthy"
+        elif escalated > 0:
+            batch["status"] = "attention"
+        else:
+            batch["status"] = "degraded"
+
+    def _remove_pending_approvals_for_batch(self, batch_id):
+        self.pending_approvals = [
+            item for item in self.pending_approvals if item.get("batch_id") != batch_id
+        ]
+
+    def _mark_batch_escalations_rolled_back(self, batch_id, error_ids=None):
+        target_ids = set(error_ids or [])
+        for item in self.all_escalations:
+            if item.get("batch_id") != batch_id:
+                continue
+            if target_ids and item.get("error_id") not in target_ids:
+                continue
+            item["status"] = "rolled_back"
+            item["rolled_back_at"] = self._now_text()
+
+    def _mark_log_reopened(self, log, reason):
+        previous_status = log.get("status")
+        history = log.setdefault("rollback_history", [])
+        history.append(
+            {
+                "at": self._now_text(),
+                "from_status": previous_status,
+                "from_action": log.get("resolution_action"),
+                "from_value": log.get("resolved_value"),
+                "reason": reason,
+            }
+        )
+        log["status"] = "reopened"
+        log["resolver"] = "Rollback Controller"
+        log["approval_required"] = False
+        log["resolved_at"] = self._now_text()
+        log["resolution_action"] = reason
+        log["resolved_value"] = None
+
+    def rollback_error(self, error_id):
+        with self.lock:
+            batch = self._find_batch_containing_log(error_id)
+            log = self._find_log_in_batch(batch, error_id) if batch else None
+            if not batch or not log:
+                raise ValueError("Resolved issue not found.")
+            if log.get("status") not in self._active_resolution_statuses():
+                raise ValueError("Only active resolved issues can be rolled back.")
+
+            batch_id = batch.get("batch_id") or batch.get("cycle_id")
+            self._mark_batch_escalations_rolled_back(batch_id, [error_id])
+            self._mark_log_reopened(log, "Rolled back this resolution. Issue reopened for another healing attempt.")
+            self._rebuild_healed_for_batch(batch)
+            self._refresh_batch_summary(batch)
+            self._update_metrics_from_history()
+            self._prepend_event("rollback", f"{error_id} | Per-error rollback completed for {batch_id}.")
+            self._write_latest_logs()
+
+    def rollback_batch(self, batch_id):
+        with self.lock:
+            batch = self._find_batch_record(batch_id)
+            if not batch:
+                raise ValueError("Batch not found.")
+
+            active_logs = [
+                log for log in batch.get("detailed_logs", []) if log.get("status") in self._active_resolution_statuses()
+            ]
+            if not active_logs and batch["datasets"]["healed"] == batch["datasets"]["dirty"]:
+                raise ValueError("Batch is already at its dirty-state baseline.")
+
+            self._remove_pending_approvals_for_batch(batch_id)
+            self._mark_batch_escalations_rolled_back(batch_id)
+            for log in batch.get("detailed_logs", []):
+                if log.get("status") in self._active_resolution_statuses() or log.get("status") in {"escalated", "rejected"}:
+                    self._mark_log_reopened(log, "Batch rollback restored the batch to the original dirty-state baseline.")
+            batch["datasets"]["healed"] = deepcopy(batch["datasets"]["dirty"])
+            self._refresh_batch_summary(batch)
+            self._update_metrics_from_history()
+            self._prepend_event("rollback", f"{batch_id} | Batch rollback restored healed data to the saved dirty snapshot.")
+            self._write_latest_logs()
+
+    def reapply_batch_healing(self, batch_id):
+        with self.lock:
+            batch = self._find_batch_record(batch_id)
+            if not batch:
+                raise ValueError("Batch not found.")
+
+            self._remove_pending_approvals_for_batch(batch_id)
+            healed, detailed_logs, approvals = self._resolve_issues(
+                deepcopy(batch["datasets"]["clean"]),
+                deepcopy(batch["datasets"]["dirty"]),
+                deepcopy(batch.get("detected_issues", [])),
+            )
+            started_at = self._now_text()
+            for approval in approvals:
+                approval["batch_id"] = batch_id
+                approval["created_at"] = started_at
+                approval["history"] = []
+            self.pending_approvals.extend(approvals)
+            self.all_escalations.extend(deepcopy(approvals))
+            batch["datasets"]["healed"] = healed
+            batch["detailed_logs"] = detailed_logs
+            self._refresh_batch_summary(batch)
+            self._update_metrics_from_history()
+            self._prepend_event("healing", f"{batch_id} | Batch healing was reapplied from the original dirty snapshot.")
+            self._write_latest_logs()
+
     def approve_escalation(self, error_id):
         with self.lock:
             approval = self._find_approval(error_id, require_pending=True)
@@ -1013,6 +1234,11 @@ Generated at: {report['generated_at']}
             batch["summary"]["escalated"] = escalated
             batch["status"] = "healthy" if escalated == 0 else "attention"
             self._update_metrics_from_history()
+            self._prepend_event(
+                "approval",
+                f"{error_id} | Human approval applied for {approval['batch_id']}.",
+                approval["approved_at"],
+            )
             self._write_latest_logs()
 
     def reject_escalation(self, error_id):
@@ -1040,6 +1266,11 @@ Generated at: {report['generated_at']}
                     batch["summary"]["escalated"] = sum(
                         1 for item in batch["detailed_logs"] if item["status"] == "escalated"
                     )
+            self._prepend_event(
+                "review",
+                f"{error_id} | Human reviewer rejected the proposed fix.",
+                approval["rejected_at"],
+            )
             self._write_latest_logs()
 
     def manual_fix_escalation(self, error_id, manual_value):
@@ -1087,6 +1318,11 @@ Generated at: {report['generated_at']}
             )
             batch["status"] = "healthy" if batch["summary"]["escalated"] == 0 else "attention"
             self._update_metrics_from_history()
+            self._prepend_event(
+                "approval",
+                f"{error_id} | Manual fix applied by human reviewer for {approval['batch_id']}.",
+                approval["manual_fixed_at"],
+            )
             self._write_latest_logs()
 
     def loop(self):
@@ -1133,6 +1369,50 @@ Generated at: {report['generated_at']}
         payload["analytics"] = self.build_analysis_report()
         return payload
 
+    def batch_errors(self, batch_id):
+        with self.lock:
+            batch = next(
+                (
+                    deepcopy(item)
+                    for item in self.state.get("history", [])
+                    if (item.get("batch_id") or item.get("cycle_id")) == batch_id
+                ),
+                None,
+            )
+        if batch is None:
+            return None
+        return {
+            "batch_id": batch_id,
+            "detailed_logs": batch.get("detailed_logs", []),
+        }
+
+    def current_healed_csv(self, dataset_name):
+        with self.lock:
+            current = deepcopy(self.state.get("current_cycle"))
+        if not current:
+            return None
+
+        rows = current.get("datasets", {}).get("healed", {}).get(dataset_name)
+        if rows is None:
+            return None
+
+        fieldnames = []
+        for row in rows:
+            for key in row.keys():
+                if key not in fieldnames:
+                    fieldnames.append(key)
+
+        buffer = io.StringIO()
+        writer = csv.DictWriter(buffer, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({key: row.get(key, "") for key in fieldnames})
+        return {
+            "batch_id": current.get("batch_id") or current.get("cycle_id") or "latest",
+            "dataset": dataset_name,
+            "csv": buffer.getvalue(),
+        }
+
 
 ENGINE = SimulationEngine()
 
@@ -1167,6 +1447,30 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == "/api/state":
             self._json(ENGINE.snapshot())
+            return
+        if parsed.path.startswith("/api/healed-data/") and parsed.path.endswith(".csv"):
+            dataset_name = parsed.path.removeprefix("/api/healed-data/").removesuffix(".csv")
+            if dataset_name not in {"orders", "payments", "delivery"}:
+                self._json({"ok": False, "error": "Dataset not found."}, status=404)
+                return
+            payload = ENGINE.current_healed_csv(dataset_name)
+            if payload is None:
+                self._json({"ok": False, "error": "No healed dataset available yet."}, status=404)
+                return
+            self._download(
+                f"{payload['batch_id']}-{dataset_name}-healed.csv",
+                payload["csv"],
+                "text/csv; charset=utf-8",
+            )
+            return
+        if parsed.path.startswith("/api/batch/") and parsed.path.endswith("/errors"):
+            parts = parsed.path.strip("/").split("/")
+            batch_id = parts[2] if len(parts) == 4 else ""
+            payload = ENGINE.batch_errors(batch_id)
+            if payload is None:
+                self._json({"ok": False, "error": f"Batch `{batch_id}` not found."}, status=404)
+                return
+            self._json(payload)
             return
         if parsed.path == "/api/analysis-report.json":
             with ENGINE.lock:
@@ -1213,6 +1517,12 @@ class Handler(BaseHTTPRequestHandler):
                     payload.get("error_id", ""),
                     payload.get("manual_value", ""),
                 )
+            elif payload.get("action") == "rollback-error":
+                ENGINE.rollback_error(payload.get("error_id", ""))
+            elif payload.get("action") == "rollback-batch":
+                ENGINE.rollback_batch(payload.get("batch_id", ""))
+            elif payload.get("action") == "reapply-batch-healing":
+                ENGINE.reapply_batch_healing(payload.get("batch_id", ""))
             else:
                 ENGINE.handle_action(payload.get("action", ""))
         except Exception as exc:

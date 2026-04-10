@@ -4,17 +4,77 @@
     {
       "error_id": "batch-001-001",
       "cycle_id": "batch-001",
-      "type": "duplicate_record",
-      "dataset": "delivery",
+      "type": "invalid_payment_value",
+      "dataset": "payments",
       "severity": "medium",
-      "row_index": 13,
-      "column": null,
-      "message": "A duplicate record was appended.",
+      "row_index": 1,
+      "column": "payment_value",
+      "message": "Payment value was converted from numeric to text.",
+      "original_value": "313.19",
+      "dirty_value": "NaN??"
+    },
+    {
+      "error_id": "batch-001-002",
+      "cycle_id": "batch-001",
+      "type": "invalid_timestamp",
+      "dataset": "orders",
+      "severity": "medium",
+      "row_index": 0,
+      "column": "order_purchase_timestamp",
+      "message": "Order purchase timestamp was malformed.",
+      "original_value": "2017-05-09 20:48:59",
+      "dirty_value": "2026/99/99 88:61:00"
+    },
+    {
+      "error_id": "batch-001-003",
+      "cycle_id": "batch-001",
+      "type": "unknown_payment_type",
+      "dataset": "payments",
+      "severity": "low",
+      "row_index": 9,
+      "column": "payment_type",
+      "message": "Payment type was changed to an unsupported value.",
+      "original_value": "credit_card",
+      "dirty_value": "telepathy"
+    },
+    {
+      "error_id": "batch-001-004",
+      "cycle_id": "batch-001",
+      "type": "freight_outlier",
+      "dataset": "delivery",
+      "severity": "low",
+      "row_index": 9,
+      "column": "freight_value",
+      "message": "Freight value was changed to an unrealistic outlier.",
+      "original_value": "12.79",
+      "dirty_value": "99999.99"
+    },
+    {
+      "error_id": "batch-001-005",
+      "cycle_id": "batch-001",
+      "type": "missing_column",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": null,
+      "column": "freight_value",
+      "message": "A required column was removed from the dataset.",
       "original_value": null,
       "dirty_value": null
     },
     {
-      "error_id": "batch-001-002",
+      "error_id": "batch-001-006",
+      "cycle_id": "batch-001",
+      "type": "orphan_record",
+      "dataset": "delivery",
+      "severity": "high",
+      "row_index": 2,
+      "column": "order_id",
+      "message": "Foreign key no longer matches a clean order.",
+      "original_value": "d887b52c6516beb39e8cd44a5f8b60f7",
+      "dirty_value": "orphan-5994"
+    },
+    {
+      "error_id": "batch-001-007",
       "cycle_id": "batch-001",
       "type": "null_key",
       "dataset": "payments",
@@ -22,32 +82,8 @@
       "row_index": 8,
       "column": "order_id",
       "message": "Primary key order_id was blanked out.",
-      "original_value": "e346cd9299371b18c0b28e8e29a5e376",
-      "dirty_value": ""
-    },
-    {
-      "error_id": "batch-001-003",
-      "cycle_id": "batch-001",
-      "type": "orphan_record",
-      "dataset": "payments",
-      "severity": "high",
-      "row_index": 6,
-      "column": "order_id",
-      "message": "Foreign key no longer matches a clean order.",
       "original_value": "10c320f977c6a18f91b2d14be13128c6",
-      "dirty_value": "orphan-1611"
-    },
-    {
-      "error_id": "batch-001-004",
-      "cycle_id": "batch-001",
-      "type": "missing_column",
-      "dataset": "payments",
-      "severity": "high",
-      "row_index": null,
-      "column": "payment_value",
-      "message": "A required column was removed from the dataset.",
-      "original_value": null,
-      "dirty_value": null
+      "dirty_value": ""
     }
   ]
 }

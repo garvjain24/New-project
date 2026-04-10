@@ -372,6 +372,68 @@ button.ghost {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.event-feed-item {
+  margin: -14px -16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border-left: 4px solid transparent;
+}
+
+.event-feed-item--success {
+  background: rgba(117, 245, 200, 0.08);
+  border-left-color: var(--mint);
+}
+
+.event-feed-item--warning {
+  background: rgba(255, 209, 102, 0.1);
+  border-left-color: var(--amber);
+}
+
+.event-feed-item--danger {
+  background: rgba(255, 122, 144, 0.1);
+  border-left-color: var(--rose);
+}
+
+.event-feed-item--neutral {
+  background: rgba(95, 225, 255, 0.06);
+  border-left-color: var(--cyan);
+}
+
+.batch-log-group {
+  padding: 18px;
+}
+
+.batch-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.batch-log-subtitle,
+.batch-log-count,
+.batch-log-empty {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.batch-log-count {
+  white-space: nowrap;
+}
+
+.batch-log-entries {
+  display: grid;
+  gap: 12px;
+}
+
+.batch-log-entry {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .event-meta {
   display: flex;
   justify-content: space-between;
@@ -568,6 +630,20 @@ td {
 
 tbody tr:nth-child(odd) {
   background: rgba(255, 255, 255, 0.025);
+}
+
+.compare-changed {
+  font-weight: 600;
+}
+
+.compare-dirty {
+  background: rgba(255, 122, 144, 0.12);
+  color: #ffd7df;
+}
+
+.compare-healed {
+  background: rgba(117, 245, 200, 0.12);
+  color: #cffff0;
 }
 
 .dirty {
