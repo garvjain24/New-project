@@ -6,19 +6,19 @@ The implementation uses the project’s live validation and repair engine as the
 
 ## Result
 
-The primary experiment achieved precision 0.84, recall 0.73, F1-score 0.79, and accuracy 0.87. The auto-heal rate was 83.33% with an escalation rate of 5.90%. Average simulated MTTD was 5.44s and MTTR was 31.68s.
+The primary experiment achieved precision 0.84, recall 0.73, F1-score 0.79, and accuracy 0.87. The auto-heal rate was 84.67% with an escalation rate of 14.56%. Average simulated MTTD was 5.46s and MTTR was 31.11s.
 
 ## Observation for Time for process lower and higher
 
-Lower-bound runs completed in an average of 91.965 ms per batch, while higher-bound runs averaged 164.503 ms. The higher-load configuration added 72.538 ms on average, showing the expected increase in end-to-end processing time as both row volume and injected complexity rise.
+Lower-bound runs completed in an average of 84.445 ms per batch, while higher-bound runs averaged 165.310 ms. The higher-load configuration added 80.865 ms on average, showing the expected increase in end-to-end processing time as both row volume and injected complexity rise.
 
 ## Observation for Time taken for controlled environment and errors
 
-In the controlled environment without injected errors, average total batch time was 56.934 ms. With injected errors, average total batch time rose to 165.572 ms, a relative increase of 100.00%. This isolates the overhead introduced by validation failures, routing, and recovery logic.
+In the controlled environment without injected errors, average total batch time was 55.937 ms. With injected errors, average total batch time rose to 177.738 ms, a relative increase of 100.00%. This isolates the overhead introduced by validation failures, routing, and recovery logic.
 
 ## Different Dataset
 
-Different dataset profiles show that Olist Subset processed 11536 rows with auto-heal 83.33% and avg total batch time 171.860 ms; Low Volume processed 250 rows with auto-heal 83.03% and avg total batch time 91.965 ms; High Volume processed 7500 rows with auto-heal 87.64% and avg total batch time 164.503 ms.
+Different dataset profiles show that Olist Subset processed 11536 rows with auto-heal 84.67% and avg total batch time 173.556 ms; Low Volume processed 250 rows with auto-heal 90.46% and avg total batch time 84.445 ms; High Volume processed 7500 rows with auto-heal 84.93% and avg total batch time 165.310 ms.
 
 ## Comparison with the state of the art
 
@@ -37,14 +37,14 @@ Comparison of the proposed agentic pipeline against standard verification paradi
 
 ## Standard Procedures
 
-- null_key: runs=25, heal_rate=0.00%, avg_resolution=182.62s, avg_actual=56.708ms
-- duplicate_record: runs=25, heal_rate=93.35%, avg_resolution=6.85s, avg_actual=57.002ms
-- invalid_payment_value: runs=25, heal_rate=94.90%, avg_resolution=11.02s, avg_actual=65.003ms
-- orphan_record: runs=25, heal_rate=93.09%, avg_resolution=9.83s, avg_actual=58.905ms
-- invalid_timestamp: runs=25, heal_rate=93.34%, avg_resolution=9.21s, avg_actual=62.370ms
-- freight_outlier: runs=25, heal_rate=95.46%, avg_resolution=5.96s, avg_actual=56.827ms
-- unknown_payment_type: runs=25, heal_rate=91.77%, avg_resolution=5.07s, avg_actual=58.041ms
-- missing_column: runs=25, heal_rate=100.00%, avg_resolution=13.93s, avg_actual=54.753ms
+- null_key: runs=25, heal_rate=0.71%, avg_resolution=177.36s, avg_actual=58.931ms
+- duplicate_record: runs=25, heal_rate=96.92%, avg_resolution=7.04s, avg_actual=60.421ms
+- invalid_payment_value: runs=25, heal_rate=95.34%, avg_resolution=10.33s, avg_actual=62.966ms
+- orphan_record: runs=25, heal_rate=91.10%, avg_resolution=10.08s, avg_actual=54.451ms
+- invalid_timestamp: runs=25, heal_rate=93.29%, avg_resolution=9.14s, avg_actual=62.326ms
+- freight_outlier: runs=25, heal_rate=94.85%, avg_resolution=5.78s, avg_actual=59.564ms
+- unknown_payment_type: runs=25, heal_rate=98.70%, avg_resolution=5.34s, avg_actual=63.785ms
+- missing_column: runs=25, heal_rate=98.32%, avg_resolution=14.28s, avg_actual=62.394ms
 
 ## Chart Files
 

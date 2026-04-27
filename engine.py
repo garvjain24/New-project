@@ -910,6 +910,13 @@ Generated at: {report['generated_at']}
         if row_index is None or row_index >= len(healed[dataset]):
             return
 
+        if resolved_value in ("__DELETE__", "__DROP__"):
+            healed[dataset].pop(row_index)
+            return
+
+        if resolved_value == "__IGNORE__":
+            return
+
         if error_type == "invalid_payment_value":
             healed[dataset][row_index]["payment_value"] = resolved_value
             return
@@ -950,9 +957,18 @@ Generated at: {report['generated_at']}
     def _rebuild_healed_for_batch(self, batch):
         healed = deepcopy(batch["datasets"]["dirty"])
         clean_lookup = self._clean_lookup(batch["datasets"]["clean"])
-        for log in batch.get("detailed_logs", []):
-            if log.get("status") in self._active_resolution_statuses():
-                self._apply_resolution_log(healed, clean_lookup, log)
+        
+        active_logs = [log for log in batch.get("detailed_logs", []) if log.get("status") in self._active_resolution_statuses()]
+        non_delete_logs = [log for log in active_logs if log.get("resolved_value") not in ("__DELETE__", "__DROP__")]
+        delete_logs = [log for log in active_logs if log.get("resolved_value") in ("__DELETE__", "__DROP__")]
+
+        for log in non_delete_logs:
+            self._apply_resolution_log(healed, clean_lookup, log)
+            
+        delete_logs.sort(key=lambda log: log.get("row_index", -1), reverse=True)
+        for log in delete_logs:
+            self._apply_resolution_log(healed, clean_lookup, log)
+
         batch["datasets"]["healed"] = healed
 
     def _refresh_batch_summary(self, batch):
@@ -1173,12 +1189,17 @@ Generated at: {report['generated_at']}
             if row_index is None or row_index >= len(batch["datasets"]["healed"][dataset]):
                 raise ValueError("Target row missing.")
 
-            if approval["column"] == "order_id":
-                batch["datasets"]["healed"][dataset][row_index]["order_id"] = manual_value
-            elif approval["column"] == "row":
-                batch["datasets"]["healed"][dataset][row_index]["order_id"] = manual_value
+            if manual_value in ("__DELETE__", "__DROP__"):
+                batch["datasets"]["healed"][dataset].pop(row_index)
+            elif manual_value == "__IGNORE__":
+                pass
             else:
-                batch["datasets"]["healed"][dataset][row_index][approval["column"]] = manual_value
+                if approval["column"] == "order_id":
+                    batch["datasets"]["healed"][dataset][row_index]["order_id"] = manual_value
+                elif approval["column"] == "row":
+                    batch["datasets"]["healed"][dataset][row_index]["order_id"] = manual_value
+                else:
+                    batch["datasets"]["healed"][dataset][row_index][approval["column"]] = manual_value
 
             approval["status"] = "manually_fixed"
             approval["manual_value"] = manual_value
@@ -1193,7 +1214,14 @@ Generated at: {report['generated_at']}
             log["resolver"] = "Human Reviewer"
             log["approval_required"] = False
             log["resolved_at"] = approval["manual_fixed_at"]
-            log["resolution_action"] = "Manually fixed by human reviewer."
+            
+            if manual_value in ("__DELETE__", "__DROP__"):
+                log["resolution_action"] = "Manually deleted the record."
+            elif manual_value == "__IGNORE__":
+                log["resolution_action"] = "Manually ignored the error."
+            else:
+                log["resolution_action"] = "Manually fixed by human reviewer."
+                
             log["resolved_value"] = manual_value
             log["resolution_latency_sec"] = max(log.get("resolution_latency_sec", 0), 300)
             batch["summary"]["resolved"] = sum(
@@ -1249,9 +1277,11 @@ Generated at: {report['generated_at']}
             if log is None:
                 raise ValueError("Resolution log not found.")
 
-            if resolved_value == "__DELETE__":
+            if resolved_value in ("__DELETE__", "__DROP__"):
                 if row_index is not None and row_index < len(batch["datasets"]["healed"][dataset]):
                     batch["datasets"]["healed"][dataset].pop(row_index)
+            elif resolved_value == "__IGNORE__":
+                pass
             else:
                 if row_index is not None and row_index < len(batch["datasets"]["healed"][dataset]):
                     if approval["column"] == "order_id":

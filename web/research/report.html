@@ -154,7 +154,7 @@
         <div class="card"><small>Precision</small><strong>0.84</strong></div>
         <div class="card"><small>Recall</small><strong>0.73</strong></div>
         <div class="card"><small>F1-Score</small><strong>0.79</strong></div>
-        <div class="card"><small>Auto-Heal</small><strong>83.33%</strong></div>
+        <div class="card"><small>Auto-Heal</small><strong>84.67%</strong></div>
       </div>
     </section>
 
@@ -162,7 +162,7 @@
     <p>The implementation uses the project’s live validation and repair engine as the measurement source. Each batch is sampled from the Olist-derived clean dataset, corrupted through controlled injection rules, and passed through the same detection, routing, healing, and escalation logic used by the simulator UI. In the benchmark configuration, 100 batches were processed for the main study, while lower-bound and higher-bound timing observations were taken under fixed batch windows of 5 and 150 rows respectively.</p>
 
     <h2>Result</h2>
-    <p>The primary experiment achieved precision 0.84, recall 0.73, F1-score 0.79, and accuracy 0.87. The auto-heal rate was 83.33% with an escalation rate of 5.90%. Average simulated MTTD was 5.44s and MTTR was 31.68s.</p>
+    <p>The primary experiment achieved precision 0.84, recall 0.73, F1-score 0.79, and accuracy 0.87. The auto-heal rate was 84.67% with an escalation rate of 14.56%. Average simulated MTTD was 5.46s and MTTR was 31.11s.</p>
     <div class="grid-2">
       <div class="chart-container"><img src="assets/resolution_method_distribution.svg" alt="Resolution method distribution" /></div>
       <div class="chart-container"><img src="assets/error_type_resolution_performance.svg" alt="Error type resolution performance" /></div>
@@ -175,29 +175,29 @@
     </div>
 
     <h2>Observation for Time for process lower and higher</h2>
-    <p>Lower-bound runs completed in an average of 91.965 ms per batch, while higher-bound runs averaged 164.503 ms. The higher-load configuration added 72.538 ms on average, showing the expected increase in end-to-end processing time as both row volume and injected complexity rise.</p>
+    <p>Lower-bound runs completed in an average of 84.445 ms per batch, while higher-bound runs averaged 165.310 ms. The higher-load configuration added 80.865 ms on average, showing the expected increase in end-to-end processing time as both row volume and injected complexity rise.</p>
     <div class="grid-1">
       <div class="chart-container"><img src="assets/process_time_bounds.svg" alt="Process time lower and higher bounds" /></div>
     </div>
 
     <h2>Observation for Time taken for controlled environment and errors</h2>
-    <p>In the controlled environment without injected errors, average total batch time was 56.934 ms. With injected errors, average total batch time rose to 165.572 ms, a relative increase of 100.00%. This isolates the overhead introduced by validation failures, routing, and recovery logic.</p>
+    <p>In the controlled environment without injected errors, average total batch time was 55.937 ms. With injected errors, average total batch time rose to 177.738 ms, a relative increase of 100.00%. This isolates the overhead introduced by validation failures, routing, and recovery logic.</p>
     <div class="table-container">
       <table>
         <thead><tr><th>Scenario</th><th>Precision</th><th>Recall</th><th>Accuracy</th><th>Auto-Heal %</th><th>Avg Total ms</th></tr></thead>
         <tbody>
-          <tr><td>Controlled Clean</td><td>0.00</td><td>0.00</td><td>0.00</td><td>1.41%</td><td>56.934</td></tr>
-          <tr><td>Controlled Errors</td><td>0.86</td><td>0.74</td><td>0.88</td><td>78.31%</td><td>165.572</td></tr>
+          <tr><td>Controlled Clean</td><td>0.00</td><td>0.00</td><td>0.00</td><td>1.26%</td><td>55.937</td></tr>
+          <tr><td>Controlled Errors</td><td>0.86</td><td>0.74</td><td>0.88</td><td>84.89%</td><td>177.738</td></tr>
         </tbody>
       </table>
     </div>
 
     <h2>Different Dataset</h2>
-    <p>Different dataset profiles show that Olist Subset processed 11536 rows with auto-heal 83.33% and avg total batch time 171.860 ms; Low Volume processed 250 rows with auto-heal 83.03% and avg total batch time 91.965 ms; High Volume processed 7500 rows with auto-heal 87.64% and avg total batch time 164.503 ms.</p>
+    <p>Different dataset profiles show that Olist Subset processed 11536 rows with auto-heal 84.67% and avg total batch time 173.556 ms; Low Volume processed 250 rows with auto-heal 90.46% and avg total batch time 84.445 ms; High Volume processed 7500 rows with auto-heal 84.93% and avg total batch time 165.310 ms.</p>
     <div class="table-container">
       <table>
         <thead><tr><th>Dataset</th><th>Rows</th><th>Precision</th><th>Recall</th><th>Accuracy</th><th>Auto-Heal %</th><th>Avg Total ms</th></tr></thead>
-        <tbody><tr><td>Olist Subset</td><td>11536</td><td>0.84</td><td>0.73</td><td>0.87</td><td>83.33%</td><td>171.860</td></tr><tr><td>Low Volume</td><td>250</td><td>0.87</td><td>0.74</td><td>0.89</td><td>83.03%</td><td>91.965</td></tr><tr><td>High Volume</td><td>7500</td><td>0.82</td><td>0.71</td><td>0.85</td><td>87.64%</td><td>164.503</td></tr></tbody>
+        <tbody><tr><td>Olist Subset</td><td>11536</td><td>0.84</td><td>0.73</td><td>0.87</td><td>84.67%</td><td>173.556</td></tr><tr><td>Low Volume</td><td>250</td><td>0.87</td><td>0.74</td><td>0.89</td><td>90.46%</td><td>84.445</td></tr><tr><td>High Volume</td><td>7500</td><td>0.82</td><td>0.71</td><td>0.85</td><td>84.93%</td><td>165.310</td></tr></tbody>
       </table>
     </div>
 
@@ -209,7 +209,7 @@
     <div class="table-container">
       <table>
         <thead><tr><th>System</th><th>Precision</th><th>Recall</th><th>F1</th><th>Accuracy</th><th>Auto-Heal %</th><th>MTTD</th><th>MTTR</th><th>Reference</th></tr></thead>
-        <tbody><tr><td>Manual Review (Human-Only)</td><td>0.95</td><td>0.60</td><td>0.74</td><td>0.78</td><td>0.00%</td><td>3600.00</td><td>7200.00</td><td>Template baseline for manuscript drafting. Replace with a cited manual-review benchmark before publication.</td></tr><tr><td>Rule-Based (Static Rules Only)</td><td>0.85</td><td>0.70</td><td>0.77</td><td>0.82</td><td>65.00%</td><td>5.00</td><td>15.00</td><td>Template baseline representing a fixed-rule validation pipeline. Replace with cited literature values.</td></tr><tr><td>ML-Based (Supervised Classifier)</td><td>0.90</td><td>0.85</td><td>0.87</td><td>0.88</td><td>78.00%</td><td>3.00</td><td>10.00</td><td>Template baseline representing supervised ML detection and repair. Replace with cited literature values.</td></tr><tr><td>Hybrid ML + Rules</td><td>0.91</td><td>0.88</td><td>0.89</td><td>0.90</td><td>82.00%</td><td>2.50</td><td>8.00</td><td>Template baseline representing hybrid ML plus deterministic repair logic. Replace with cited literature values.</td></tr><tr><td>Proposed Agentic Pipeline</td><td>0.84</td><td>0.73</td><td>0.79</td><td>0.87</td><td>83.33%</td><td>5.44</td><td>31.68</td><td>This project</td></tr></tbody>
+        <tbody><tr><td>Manual Review (Human-Only)</td><td>0.95</td><td>0.60</td><td>0.74</td><td>0.78</td><td>0.00%</td><td>3600.00</td><td>7200.00</td><td>Template baseline for manuscript drafting. Replace with a cited manual-review benchmark before publication.</td></tr><tr><td>Rule-Based (Static Rules Only)</td><td>0.85</td><td>0.70</td><td>0.77</td><td>0.82</td><td>65.00%</td><td>5.00</td><td>15.00</td><td>Template baseline representing a fixed-rule validation pipeline. Replace with cited literature values.</td></tr><tr><td>ML-Based (Supervised Classifier)</td><td>0.90</td><td>0.85</td><td>0.87</td><td>0.88</td><td>78.00%</td><td>3.00</td><td>10.00</td><td>Template baseline representing supervised ML detection and repair. Replace with cited literature values.</td></tr><tr><td>Hybrid ML + Rules</td><td>0.91</td><td>0.88</td><td>0.89</td><td>0.90</td><td>82.00%</td><td>2.50</td><td>8.00</td><td>Template baseline representing hybrid ML plus deterministic repair logic. Replace with cited literature values.</td></tr><tr><td>Proposed Agentic Pipeline</td><td>0.84</td><td>0.73</td><td>0.79</td><td>0.87</td><td>84.67%</td><td>5.46</td><td>31.11</td><td>This project</td></tr></tbody>
       </table>
     </div>
 
@@ -226,7 +226,7 @@
     <div class="table-container">
       <table>
         <thead><tr><th>Error Type</th><th>Procedure</th><th>Runs</th><th>Heal Rate</th><th>Avg Resolution</th><th>Avg Actual Time</th></tr></thead>
-        <tbody><tr><td>null_key</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>0.00%</td><td>182.62s</td><td>56.708ms</td></tr><tr><td>duplicate_record</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>93.35%</td><td>6.85s</td><td>57.002ms</td></tr><tr><td>invalid_payment_value</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>94.90%</td><td>11.02s</td><td>65.003ms</td></tr><tr><td>orphan_record</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>93.09%</td><td>9.83s</td><td>58.905ms</td></tr><tr><td>invalid_timestamp</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>93.34%</td><td>9.21s</td><td>62.370ms</td></tr><tr><td>freight_outlier</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>95.46%</td><td>5.96s</td><td>56.827ms</td></tr><tr><td>unknown_payment_type</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>91.77%</td><td>5.07s</td><td>58.041ms</td></tr><tr><td>missing_column</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>100.00%</td><td>13.93s</td><td>54.753ms</td></tr></tbody>
+        <tbody><tr><td>null_key</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>0.71%</td><td>177.36s</td><td>58.931ms</td></tr><tr><td>duplicate_record</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>96.92%</td><td>7.04s</td><td>60.421ms</td></tr><tr><td>invalid_payment_value</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>95.34%</td><td>10.33s</td><td>62.966ms</td></tr><tr><td>orphan_record</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>91.10%</td><td>10.08s</td><td>54.451ms</td></tr><tr><td>invalid_timestamp</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>93.29%</td><td>9.14s</td><td>62.326ms</td></tr><tr><td>freight_outlier</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>94.85%</td><td>5.78s</td><td>59.564ms</td></tr><tr><td>unknown_payment_type</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>98.70%</td><td>5.34s</td><td>63.785ms</td></tr><tr><td>missing_column</td><td>Select a fixed 12-row batch, inject exactly one error of this type, run validation and healing, and record both simulated latency and actual wall-clock resolution time.</td><td>25</td><td>98.32%</td><td>14.28s</td><td>62.394ms</td></tr></tbody>
       </table>
     </div>
     <div class="grid-1">

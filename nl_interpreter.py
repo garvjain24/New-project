@@ -32,6 +32,7 @@ _INTENT_PATTERNS = [
         "keywords": [
             "set to", "change to", "update to", "make it",
             "replace with", "should be", "put", "assign",
+            "the correct value is"
         ],
         "description": "Set a specific value provided by the user",
     },
@@ -66,8 +67,12 @@ def _extract_quoted_value(text):
     match = re.search(r'["\']([^"\']+)["\']', text)
     if match:
         return match.group(1)
-    # Try after "to " or "be " or "with "
-    for prefix in ["set to ", "change to ", "update to ", "replace with ", "should be ", "make it "]:
+    # Try after specific prefixes
+    prefixes = [
+        "the correct value is ", "set to ", "change to ", 
+        "update to ", "replace with ", "should be ", "make it "
+    ]
+    for prefix in prefixes:
         idx = text.lower().find(prefix)
         if idx >= 0:
             candidate = text[idx + len(prefix):].strip().rstrip(".")
