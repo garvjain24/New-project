@@ -1,0 +1,46 @@
+[
+  {
+    "system": "Manual Review (Human-Only)",
+    "precision": 0.95,
+    "recall": 0.60,
+    "f1_score": 0.74,
+    "accuracy": 0.78,
+    "auto_heal_rate": 0.00,
+    "mttd_seconds": 3600.0,
+    "mttr_seconds": 7200.0,
+    "reference": "Template baseline for manuscript drafting. Replace with a cited manual-review benchmark before publication."
+  },
+  {
+    "system": "Rule-Based (Static Rules Only)",
+    "precision": 0.85,
+    "recall": 0.70,
+    "f1_score": 0.77,
+    "accuracy": 0.82,
+    "auto_heal_rate": 0.65,
+    "mttd_seconds": 5.0,
+    "mttr_seconds": 15.0,
+    "reference": "Template baseline representing a fixed-rule validation pipeline. Replace with cited literature values."
+  },
+  {
+    "system": "ML-Based (Supervised Classifier)",
+    "precision": 0.90,
+    "recall": 0.85,
+    "f1_score": 0.87,
+    "accuracy": 0.88,
+    "auto_heal_rate": 0.78,
+    "mttd_seconds": 3.0,
+    "mttr_seconds": 10.0,
+    "reference": "Template baseline representing supervised ML detection and repair. Replace with cited literature values."
+  },
+  {
+    "system": "Hybrid ML + Rules",
+    "precision": 0.91,
+    "recall": 0.88,
+    "f1_score": 0.89,
+    "accuracy": 0.90,
+    "auto_heal_rate": 0.82,
+    "mttd_seconds": 2.5,
+    "mttr_seconds": 8.0,
+    "reference": "Template baseline representing hybrid ML plus deterministic repair logic. Replace with cited literature values."
+  }
+]

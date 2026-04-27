@@ -11,6 +11,16 @@ REQUIRED_COLUMNS = {
 }
 
 DEFAULT_SOURCE_DIR = Path("/Users/garv/Downloads/archive")
+ERROR_TYPES = [
+    "null_key",
+    "duplicate_record",
+    "invalid_payment_value",
+    "orphan_record",
+    "invalid_timestamp",
+    "freight_outlier",
+    "unknown_payment_type",
+    "missing_column",
+]
 
 
 def read_csv_rows(path):
@@ -190,6 +200,181 @@ def _append_error(errors, cycle_id, error_type, dataset, severity, message, row_
             "dirty_value": dirty_value,
         }
     )
+
+
+def inject_specific_error(clean_dataset, cycle_id, error_type, rng=None):
+    rng = rng or random.Random()
+    dirty = deepcopy(clean_dataset)
+    errors = []
+
+    def pick_row(name):
+        rows = dirty[name]
+        if not rows:
+            return None, None
+        index = rng.randrange(len(rows))
+        return rows, index
+
+    if error_type == "null_key":
+        dataset = rng.choice(["orders", "payments", "delivery"])
+        rows, idx = pick_row(dataset)
+        if idx is None:
+            return dirty, errors
+        original = rows[idx].get("order_id", "")
+        rows[idx]["order_id"] = ""
+        _append_error(
+            errors,
+            cycle_id,
+            "null_key",
+            dataset,
+            "critical",
+            "Primary key order_id was blanked out.",
+            row_index=idx,
+            column="order_id",
+            original_value=original,
+            dirty_value="",
+        )
+        return dirty, errors
+
+    if error_type == "duplicate_record":
+        dataset = rng.choice(["orders", "payments", "delivery"])
+        rows, idx = pick_row(dataset)
+        if idx is None:
+            return dirty, errors
+        rows.append(deepcopy(rows[idx]))
+        _append_error(
+            errors,
+            cycle_id,
+            "duplicate_record",
+            dataset,
+            "medium",
+            "A duplicate record was appended.",
+            row_index=idx,
+        )
+        return dirty, errors
+
+    if error_type == "invalid_payment_value":
+        rows, idx = pick_row("payments")
+        if idx is None or "payment_value" not in rows[idx]:
+            return dirty, errors
+        original = rows[idx]["payment_value"]
+        dirty_value = rng.choice(["ten thousand", "NaN??", "forty two"])
+        rows[idx]["payment_value"] = dirty_value
+        _append_error(
+            errors,
+            cycle_id,
+            "invalid_payment_value",
+            "payments",
+            "medium",
+            "Payment value was converted from numeric to text.",
+            row_index=idx,
+            column="payment_value",
+            original_value=original,
+            dirty_value=dirty_value,
+        )
+        return dirty, errors
+
+    if error_type == "orphan_record":
+        dataset = rng.choice(["payments", "delivery"])
+        rows, idx = pick_row(dataset)
+        if idx is None:
+            return dirty, errors
+        original = rows[idx]["order_id"]
+        dirty_value = f"orphan-{rng.randint(1000, 9999)}"
+        rows[idx]["order_id"] = dirty_value
+        _append_error(
+            errors,
+            cycle_id,
+            "orphan_record",
+            dataset,
+            "high",
+            "Foreign key no longer matches a clean order.",
+            row_index=idx,
+            column="order_id",
+            original_value=original,
+            dirty_value=dirty_value,
+        )
+        return dirty, errors
+
+    if error_type == "invalid_timestamp":
+        rows, idx = pick_row("orders")
+        if idx is None or "order_purchase_timestamp" not in rows[idx]:
+            return dirty, errors
+        original = rows[idx]["order_purchase_timestamp"]
+        dirty_value = "2026/99/99 88:61:00"
+        rows[idx]["order_purchase_timestamp"] = dirty_value
+        _append_error(
+            errors,
+            cycle_id,
+            "invalid_timestamp",
+            "orders",
+            "medium",
+            "Order purchase timestamp was malformed.",
+            row_index=idx,
+            column="order_purchase_timestamp",
+            original_value=original,
+            dirty_value=dirty_value,
+        )
+        return dirty, errors
+
+    if error_type == "freight_outlier":
+        rows, idx = pick_row("delivery")
+        if idx is None or "freight_value" not in rows[idx]:
+            return dirty, errors
+        original = rows[idx]["freight_value"]
+        dirty_value = "99999.99"
+        rows[idx]["freight_value"] = dirty_value
+        _append_error(
+            errors,
+            cycle_id,
+            "freight_outlier",
+            "delivery",
+            "low",
+            "Freight value was changed to an unrealistic outlier.",
+            row_index=idx,
+            column="freight_value",
+            original_value=original,
+            dirty_value=dirty_value,
+        )
+        return dirty, errors
+
+    if error_type == "unknown_payment_type":
+        rows, idx = pick_row("payments")
+        if idx is None or "payment_type" not in rows[idx]:
+            return dirty, errors
+        original = rows[idx]["payment_type"]
+        dirty_value = "telepathy"
+        rows[idx]["payment_type"] = dirty_value
+        _append_error(
+            errors,
+            cycle_id,
+            "unknown_payment_type",
+            "payments",
+            "low",
+            "Payment type was changed to an unsupported value.",
+            row_index=idx,
+            column="payment_type",
+            original_value=original,
+            dirty_value=dirty_value,
+        )
+        return dirty, errors
+
+    if error_type == "missing_column":
+        dataset = rng.choice(["payments", "delivery"])
+        column = rng.choice(["payment_value"] if dataset == "payments" else ["seller_id", "freight_value"])
+        for row in dirty[dataset]:
+            row.pop(column, None)
+        _append_error(
+            errors,
+            cycle_id,
+            "missing_column",
+            dataset,
+            "high",
+            "A required column was removed from the dataset.",
+            column=column,
+        )
+        return dirty, errors
+
+    raise ValueError(f"Unsupported error type `{error_type}`.")
 
 
 def generate_dirty_dataset(clean_dataset, cycle_id, error_count=None, rng=None):

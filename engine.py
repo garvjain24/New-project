@@ -342,28 +342,31 @@ Generated at: {report['generated_at']}
         return datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S")
 
     def _simulated_detection_latency(self, severity):
-        return {
-            "critical": 2,
-            "high": 4,
-            "medium": 6,
-            "low": 8,
-        }.get(severity, 5)
+        base = {
+            "critical": 2.0,
+            "high": 4.0,
+            "medium": 6.0,
+            "low": 8.0,
+        }.get(severity, 5.0)
+        return round(max(0.1, random.gauss(base, base * 0.15)), 2)
 
     def _simulated_resolution_latency(self, error_type, escalated=False):
         if escalated:
-            return {
-                "null_key": 180,
-                "orphan_record": 150,
-                "missing_column": 120,
-            }.get(error_type, 210)
-        return {
-            "duplicate_record": 7,
-            "invalid_payment_value": 11,
-            "invalid_timestamp": 9,
-            "freight_outlier": 6,
-            "unknown_payment_type": 5,
-            "missing_column": 14,
-        }.get(error_type, 10)
+            base = {
+                "null_key": 180.0,
+                "orphan_record": 150.0,
+                "missing_column": 120.0,
+            }.get(error_type, 210.0)
+        else:
+            base = {
+                "duplicate_record": 7.0,
+                "invalid_payment_value": 11.0,
+                "invalid_timestamp": 9.0,
+                "freight_outlier": 6.0,
+                "unknown_payment_type": 5.0,
+                "missing_column": 14.0,
+            }.get(error_type, 10.0)
+        return round(max(0.1, random.gauss(base, base * 0.2)), 2)
 
     def _load_clean(self):
         if not (CLEAN_DIR / "orders.csv").exists():
@@ -670,6 +673,27 @@ Generated at: {report['generated_at']}
                 log["escalation_mode"] = "human_resolution"
                 log["resolution_action"] = "No automated playbook exists for this error."
                 log["resolution_latency_sec"] = self._simulated_resolution_latency(error_type, escalated=True)
+
+            # Introduce stochastic real-world imperfections so success isn't always artificially 100%
+            if log["status"] == "resolved":
+                probabilities = {
+                    "null_key": 0.05,
+                    "invalid_timestamp": 0.12,
+                    "invalid_payment_value": 0.08,
+                    "unknown_payment_type": 0.15,
+                    "missing_column": 0.09,
+                    "duplicate_record": 0.02,
+                    "freight_outlier": 0.11,
+                    "orphan_record": 0.07
+                }
+                fail_chance = probabilities.get(error_type, 0.10)
+                if random.random() < fail_chance:
+                    log["status"] = "escalated"
+                    log["resolver"] = "Human Ops"
+                    log["approval_required"] = True
+                    log["escalation_mode"] = "human_resolution"
+                    log["resolution_action"] = f"Auto-heal confidence threshold not met. Manual review requested."
+                    log["resolution_latency_sec"] = self._simulated_resolution_latency(error_type, escalated=True)
 
             if log["status"] == "resolved":
                 log["resolver"] = (

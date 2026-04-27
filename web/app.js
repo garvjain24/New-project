@@ -1236,6 +1236,63 @@ document.getElementById("reapply-batch-healing-btn").addEventListener("click", (
   postAction({ action: "reapply-batch-healing", batch_id: batchId });
 });
 
+let researchPollInterval = null;
+
+function pollResearchStatus() {
+  const statusEl = document.getElementById("research-status");
+  if (!statusEl) return;
+  fetch("/api/research/status")
+    .then((r) => r.json())
+    .then((data) => {
+      const viewBtn = document.getElementById("research-view-btn");
+      const downloadBtn = document.getElementById("research-download-btn");
+      const genBtn = document.getElementById("research-generate-btn");
+
+      if (data.status === "running") {
+        statusEl.innerHTML = "<span class='pulse'>⚙️ Running benchmarks and rendering reports...</span>";
+        genBtn.disabled = true;
+        viewBtn.style.display = "none";
+        downloadBtn.style.display = "none";
+      } else if (data.status === "complete") {
+        statusEl.innerHTML = "✅ Research reports generated successfully.";
+        genBtn.disabled = false;
+        viewBtn.style.display = "inline-flex";
+        downloadBtn.style.display = "inline-flex";
+        if (researchPollInterval) {
+          clearInterval(researchPollInterval);
+          researchPollInterval = null;
+        }
+      } else if (data.status === "error") {
+        statusEl.innerHTML = "❌ Error: " + escapeHtml(data.error || "Unknown error");
+        genBtn.disabled = false;
+        if (researchPollInterval) {
+          clearInterval(researchPollInterval);
+          researchPollInterval = null;
+        }
+      }
+    })
+    .catch((err) => console.error("Research poll err:", err));
+}
+
+document.getElementById("research-generate-btn")?.addEventListener("click", () => {
+  postAction({ action: "generate-research" });
+  if (!researchPollInterval) {
+    researchPollInterval = setInterval(pollResearchStatus, 2000);
+  }
+  const statusEl = document.getElementById("research-status");
+  statusEl.innerHTML = "<span class='pulse'>⚙️ Starting generation...</span>";
+  document.getElementById("research-generate-btn").disabled = true;
+});
+
+document.getElementById("research-view-btn")?.addEventListener("click", () => {
+  window.open("/research/report.html", "_blank");
+});
+
+document.getElementById("research-download-btn")?.addEventListener("click", () => {
+  window.location.href = "/api/research/download";
+});
+
 fetchState();
+pollResearchStatus();
 setInterval(fetchState, 2500);
 setInterval(updateCountdown, 500);

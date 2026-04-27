@@ -2,9 +2,31 @@ import json
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
+from pathlib import Path
 
-from config import DIRTY_DIR, LOGS_DIR, WEB_DIR
+from config import DIRTY_DIR, LOGS_DIR, WEB_DIR, BASE_DIR
 from engine import ENGINE
+
+RESEARCH_STATE = {"status": "idle", "error": None}
+
+def run_research_task():
+    RESEARCH_STATE["status"] = "running"
+    RESEARCH_STATE["error"] = None
+    import subprocess
+    try:
+        proc = subprocess.run(
+            ["python3", str(BASE_DIR / "scripts" / "generate_research.py")],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        RESEARCH_STATE["status"] = "complete"
+    except subprocess.CalledProcessError as e:
+        RESEARCH_STATE["status"] = "error"
+        RESEARCH_STATE["error"] = str(e.stderr or e.stdout)
+    except Exception as e:
+        RESEARCH_STATE["status"] = "error"
+        RESEARCH_STATE["error"] = str(e)
 
 class Handler(BaseHTTPRequestHandler):
     def _json(self, payload, status=200):
@@ -60,6 +82,37 @@ class Handler(BaseHTTPRequestHandler):
                 self._json({"ok": False, "error": f"Batch `{batch_id}` not found."}, status=404)
                 return
             self._json(payload)
+            return
+        if parsed.path == "/api/research/status":
+            self._json(RESEARCH_STATE)
+            return
+        if parsed.path == "/api/research/download":
+            import shutil
+            import tempfile
+            temp_zip = Path(tempfile.gettempdir()) / "research_archive"
+            shutil.make_archive(str(temp_zip), 'zip', str(WEB_DIR / "research"))
+            data = Path(str(temp_zip) + ".zip").read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/zip")
+            self.send_header("Content-Disposition", 'attachment; filename="research_bundle.zip"')
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
+        if parsed.path.startswith("/research/"):
+            file_path = WEB_DIR / parsed.path.lstrip("/")
+            if file_path.exists() and file_path.is_file():
+                ext = file_path.suffix
+                content_type = {
+                    ".html": "text/html; charset=utf-8",
+                    ".md": "text/markdown; charset=utf-8",
+                    ".svg": "image/svg+xml",
+                    ".csv": "text/csv; charset=utf-8",
+                    ".json": "application/json; charset=utf-8",
+                }.get(ext, "application/octet-stream")
+                self._file(file_path, content_type)
+            else:
+                self.send_error(404, "Not found")
             return
         if parsed.path == "/api/analysis-report.json":
             with ENGINE.lock:
@@ -119,6 +172,13 @@ class Handler(BaseHTTPRequestHandler):
                 ENGINE.rollback_batch(payload.get("batch_id", ""))
             elif payload.get("action") == "reapply-batch-healing":
                 ENGINE.reapply_batch_healing(payload.get("batch_id", ""))
+            elif payload.get("action") == "generate-research":
+                if RESEARCH_STATE["status"] == "running":
+                    self._json({"ok": False, "error": "Already running"})
+                    return
+                threading.Thread(target=run_research_task, daemon=True).start()
+                self._json({"ok": True})
+                return
             else:
                 ENGINE.handle_action(payload.get("action", ""))
         except Exception as exc:

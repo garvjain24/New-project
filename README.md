@@ -82,3 +82,17 @@ Every 15 seconds the dashboard:
 ## Good presentation line
 
 “We used a reduced subset of a real Brazilian e-commerce dataset as our standard source database, then deliberately introduced random pipeline failures during each simulation cycle to test self-healing behavior.”
+
+## Research & Benchmarking Suite
+
+This project includes a fully automated research benchmarking suite to generate publication-ready insights representing the system’s performance. 
+
+You can extract and download these charts right from the dashboard:
+1. Open the UI to the **Analytics** view.
+2. Scroll to the **Research & Benchmarking Suite** panel.
+3. Click **Generate Research Report** to spin up headless benchmarking sessions against the `SimulationEngine`.
+4. Once completed, view or download the fully rendered HTML report, underlying metrics JSON, and publication-ready SVG charts (Radar, Dual-Bar, Heatmap, Pie).
+
+### Configuring State-of-the-Art Baselines
+When generating metrics (Precision, Recall, MTTD, MTTR), the pipeline compares the performance of your LLM self-healing system against pre-defined baselines. 
+You can substitute these baselines to match cited literature values by modifying `research_baselines.json` located in the root of the project.
